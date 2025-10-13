@@ -1,8 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { MapPin, Navigation, Shield } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import heroImage from "@/assets/hero-transport.jpg";
 
 export const Hero = () => {
+  const navigate = useNavigate();
+  
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-hero">
       {/* Background Image */}
@@ -40,7 +43,12 @@ export const Hero = () => {
           
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
-            <Button variant="hero" size="lg" className="min-w-[200px]">
+            <Button 
+              variant="hero" 
+              size="lg" 
+              className="min-w-[200px]"
+              onClick={() => navigate("/auth")}
+            >
               <Navigation className="w-5 h-5" />
               Start Your Journey
             </Button>

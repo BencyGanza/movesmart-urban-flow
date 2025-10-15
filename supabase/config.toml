@@ -1,1 +1,10 @@
 project_id = "qshvqvxbkxwxqyfmdclw"
+
+[functions.match-driver]
+verify_jwt = true
+
+[functions.update-ride-status]
+verify_jwt = true
+
+[functions.process-payment]
+verify_jwt = true

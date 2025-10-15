@@ -33,7 +33,7 @@ const Auth = () => {
     setIsLoading(true);
 
     try {
-      const redirectUrl = `${window.location.origin}/`;
+      const redirectUrl = `${window.location.origin}/dashboard`;
       
       const { error } = await supabase.auth.signUp({
         email: signUpData.email,
@@ -51,10 +51,10 @@ const Auth = () => {
 
       toast({
         title: "Success!",
-        description: "Your account has been created. Welcome to MoveSmart!",
+        description: "Account created! Redirecting to dashboard...",
       });
       
-      navigate("/");
+      navigate("/dashboard");
     } catch (error: any) {
       toast({
         title: "Error",
@@ -80,10 +80,10 @@ const Auth = () => {
 
       toast({
         title: "Welcome back!",
-        description: "You've successfully signed in.",
+        description: "Redirecting to dashboard...",
       });
       
-      navigate("/");
+      navigate("/dashboard");
     } catch (error: any) {
       toast({
         title: "Error",

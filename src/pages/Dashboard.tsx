@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { supabase } from "@/integrations/supabase/client";
@@ -6,13 +6,16 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Car, MapPin, Navigation } from "lucide-react";
+import { useRides } from "@/hooks/useRides";
+import { Car, MapPin, Navigation, Clock, CheckCircle } from "lucide-react";
 import "leaflet/dist/leaflet.css";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { rides, loading: ridesLoading } = useRides();
   const [pickupAddress, setPickupAddress] = useState("");
   const [dropoffAddress, setDropoffAddress] = useState("");
   const [loading, setLoading] = useState(false);
@@ -72,6 +75,22 @@ const Dashboard = () => {
     }
   };
 
+  const getStatusBadge = (status: string) => {
+    const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
+      pending: "outline",
+      accepted: "secondary",
+      in_progress: "default",
+      completed: "default",
+      cancelled: "destructive",
+    };
+
+    return (
+      <Badge variant={variants[status] || "outline"}>
+        {status.replace("_", " ").toUpperCase()}
+      </Badge>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card">
@@ -87,9 +106,10 @@ const Dashboard = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <div className="grid lg:grid-cols-2 gap-8">
-          <Card className="p-6 shadow-card">
-            <h2 className="text-2xl font-bold mb-6 text-foreground">Book a Ride</h2>
+        <div className="grid lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-8">
+            <Card className="p-6 shadow-card">
+              <h2 className="text-2xl font-bold mb-6 text-foreground">Book a Ride</h2>
             
             <div className="space-y-4">
               <div>
@@ -128,16 +148,71 @@ const Dashboard = () => {
               </Button>
             </div>
 
-            <div className="mt-8 p-4 bg-muted rounded-lg">
-              <h3 className="font-semibold mb-2 text-foreground">Estimated Fare</h3>
-              <p className="text-2xl font-bold text-primary">KES 500 - 1,500</p>
-              <p className="text-sm text-muted-foreground mt-1">Based on distance and traffic</p>
-            </div>
-          </Card>
+              <div className="mt-8 p-4 bg-muted rounded-lg">
+                <h3 className="font-semibold mb-2 text-foreground">Estimated Fare</h3>
+                <p className="text-2xl font-bold text-primary">KES 500 - 1,500</p>
+                <p className="text-sm text-muted-foreground mt-1">Based on distance and traffic</p>
+              </div>
+            </Card>
 
-          <Card className="p-6 shadow-card overflow-hidden">
+            {/* Recent Rides */}
+            <Card className="p-6 shadow-card">
+              <h2 className="text-2xl font-bold mb-6 text-foreground">Recent Rides</h2>
+              
+              {ridesLoading ? (
+                <div className="text-center py-8 text-muted-foreground">Loading...</div>
+              ) : rides.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  No rides yet. Book your first ride!
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {rides.slice(0, 5).map((ride) => (
+                    <div
+                      key={ride.id}
+                      className="p-4 border border-border rounded-lg hover:shadow-md transition-shadow"
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <MapPin className="h-4 w-4 text-primary" />
+                            <span className="font-medium text-sm">{ride.pickup_address}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Navigation className="h-4 w-4 text-secondary" />
+                            <span className="font-medium text-sm">{ride.dropoff_address}</span>
+                          </div>
+                        </div>
+                        {getStatusBadge(ride.status)}
+                      </div>
+                      
+                      <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Clock className="h-3 w-3" />
+                          {new Date(ride.created_at).toLocaleDateString()}
+                        </div>
+                        <div className="font-bold text-primary">
+                          KES {ride.actual_fare || ride.estimated_fare}
+                        </div>
+                      </div>
+                      
+                      {ride.status === "completed" && (
+                        <div className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
+                          <CheckCircle className="h-3 w-3" />
+                          Completed
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Card>
+          </div>
+
+          {/* Map */}
+          <Card className="p-6 shadow-card overflow-hidden h-fit sticky top-8">
             <h2 className="text-2xl font-bold mb-4 text-foreground">Live Map</h2>
-            <div className="rounded-lg overflow-hidden border border-border" style={{ height: '500px' }}>
+            <div className="rounded-lg overflow-hidden border border-border" style={{ height: '600px' }}>
               <MapContainer
                 center={[-1.2921, 36.8219] as [number, number]}
                 zoom={13}

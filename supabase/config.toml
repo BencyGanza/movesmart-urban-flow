@@ -8,3 +8,9 @@ verify_jwt = true
 
 [functions.process-payment]
 verify_jwt = true
+
+[functions.update-driver-location]
+verify_jwt = true
+
+[functions.get-nearby-drivers]
+verify_jwt = true

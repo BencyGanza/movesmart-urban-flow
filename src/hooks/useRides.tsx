@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { RideService } from "@/services";
 
 export const useRides = () => {
   const [rides, setRides] = useState<any[]>([]);
@@ -13,20 +14,7 @@ export const useRides = () => {
       
       if (!user) return;
 
-      const { data, error } = await supabase
-        .from("rides")
-        .select(`
-          *,
-          vehicle:vehicles(
-            *,
-            driver:profiles!vehicles_driver_id_fkey(*)
-          )
-        `)
-        .eq("passenger_id", user.id)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-
+      const data = await RideService.getUserRides(user.id);
       setRides(data || []);
     } catch (error: any) {
       console.error("Error fetching rides:", error);

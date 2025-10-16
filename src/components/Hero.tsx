@@ -56,9 +56,10 @@ export const Hero = () => {
               variant="outline" 
               size="lg" 
               className="min-w-[200px] bg-background/10 backdrop-blur-sm border-background/30 text-primary-foreground hover:bg-background/20"
+              onClick={() => navigate("/auth")}
             >
               <Shield className="w-5 h-5" />
-              Learn More
+              Get Started
             </Button>
           </div>
           

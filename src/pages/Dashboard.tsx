@@ -1,28 +1,53 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useRides } from "@/hooks/useRides";
-import { Car, MapPin, Navigation, Clock, CheckCircle } from "lucide-react";
+import { RideService } from "@/services";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import { Map, Navigation, CreditCard, LogOut, Loader2, MapPin, Clock, CheckCircle, XCircle } from "lucide-react";
+import L from "leaflet";
+
+// Fix for default marker icon in react-leaflet
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
+  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+});
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { rides, loading: ridesLoading } = useRides();
+  const { rides, loading: ridesLoading, refetch } = useRides();
   const [pickupAddress, setPickupAddress] = useState("");
   const [dropoffAddress, setDropoffAddress] = useState("");
   const [loading, setLoading] = useState(false);
+  const [userProfile, setUserProfile] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", user.id)
+          .maybeSingle();
+        setUserProfile(data);
+      }
+    };
+    fetchUserProfile();
+  }, []);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    navigate("/");
+    navigate("/auth");
   };
 
   const handleBookRide = async () => {
@@ -36,56 +61,91 @@ const Dashboard = () => {
     }
 
     setLoading(true);
-    
-    // Mock coordinates for demo
-    const pickupLat = -1.2921 + (Math.random() - 0.5) * 0.1;
-    const pickupLng = 36.8219 + (Math.random() - 0.5) * 0.1;
-    const dropoffLat = -1.2921 + (Math.random() - 0.5) * 0.1;
-    const dropoffLng = 36.8219 + (Math.random() - 0.5) * 0.1;
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Error",
+          description: "You must be logged in to book a ride",
+          variant: "destructive",
+        });
+        navigate("/auth");
+        return;
+      }
 
-    const { data: { user } } = await supabase.auth.getUser();
-
-    const { error } = await supabase.from("rides").insert({
-      passenger_id: user?.id,
-      pickup_latitude: pickupLat,
-      pickup_longitude: pickupLng,
-      dropoff_latitude: dropoffLat,
-      dropoff_longitude: dropoffLng,
-      pickup_address: pickupAddress,
-      dropoff_address: dropoffAddress,
-      estimated_fare: 500 + Math.random() * 1000,
-      status: "pending",
-    });
-
-    setLoading(false);
-
-    if (error) {
-      toast({
-        title: "Booking Failed",
-        description: error.message,
-        variant: "destructive",
+      // Create ride using RideService
+      const ride = await RideService.createRide({
+        pickup_location: pickupAddress,
+        dropoff_location: dropoffAddress,
+        pickup_latitude: -1.2921, // Mock coordinates - Nairobi
+        pickup_longitude: 36.8219,
+        dropoff_latitude: -1.286389,
+        dropoff_longitude: 36.817223,
+        estimated_fare: 500, // Mock fare in KES
       });
-    } else {
+
       toast({
-        title: "Ride Booked!",
-        description: "Finding you a driver...",
+        title: "Success",
+        description: "Your ride has been booked successfully!",
       });
+
+      // Try to match a driver
+      try {
+        await RideService.matchDriver({ ride_id: ride.id });
+        toast({
+          title: "Driver Matched",
+          description: "A driver has been assigned to your ride!",
+        });
+      } catch (matchError) {
+        console.log("No drivers available yet");
+      }
+
       setPickupAddress("");
       setDropoffAddress("");
+      refetch();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to book ride",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCancelRide = async (rideId: string) => {
+    try {
+      await RideService.cancelRide(rideId);
+      toast({
+        title: "Success",
+        description: "Ride cancelled successfully",
+      });
+      refetch();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to cancel ride",
+        variant: "destructive",
+      });
     }
   };
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
-      pending: "outline",
-      accepted: "secondary",
-      in_progress: "default",
-      completed: "default",
-      cancelled: "destructive",
+    const variants: Record<string, any> = {
+      pending: { variant: "outline", icon: Clock },
+      accepted: { variant: "secondary", icon: CheckCircle },
+      in_progress: { variant: "default", icon: Navigation },
+      completed: { variant: "default", icon: CheckCircle },
+      cancelled: { variant: "destructive", icon: XCircle },
     };
 
+    const StatusIcon = variants[status]?.icon || Clock;
+    
     return (
-      <Badge variant={variants[status] || "outline"}>
+      <Badge variant={variants[status]?.variant || "outline"} className="flex items-center gap-1">
+        <StatusIcon className="h-3 w-3" />
         {status.replace("_", " ").toUpperCase()}
       </Badge>
     );
@@ -93,140 +153,179 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Car className="h-8 w-8 text-primary" />
-            <h1 className="text-2xl font-bold text-foreground">MoveSmart</h1>
+      {/* Header */}
+      <header className="border-b bg-card shadow-card sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold text-primary">MoveSmart</h1>
+            {userProfile && (
+              <p className="text-sm text-muted-foreground">Welcome, {userProfile.full_name}</p>
+            )}
           </div>
           <Button onClick={handleSignOut} variant="outline">
+            <LogOut className="mr-2 h-4 w-4" />
             Sign Out
           </Button>
         </div>
       </header>
 
+      {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <div className="grid lg:grid-cols-3 gap-8">
+          {/* Left Column - Booking & Rides */}
           <div className="lg:col-span-2 space-y-8">
-            <Card className="p-6 shadow-card">
-              <h2 className="text-2xl font-bold mb-6 text-foreground">Book a Ride</h2>
-            
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="pickup" className="flex items-center gap-2 mb-2">
-                  <MapPin className="h-4 w-4 text-primary" />
-                  Pickup Location
-                </Label>
-                <Input
-                  id="pickup"
-                  placeholder="Enter pickup address"
-                  value={pickupAddress}
-                  onChange={(e) => setPickupAddress(e.target.value)}
-                />
-              </div>
+            {/* Booking Card */}
+            <Card className="shadow-card">
+              <CardHeader>
+                <CardTitle className="text-2xl flex items-center gap-2">
+                  <Navigation className="h-6 w-6 text-primary" />
+                  Book a Ride
+                </CardTitle>
+                <CardDescription>Enter your pickup and dropoff locations</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium mb-2 flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-primary" />
+                    Pickup Location
+                  </label>
+                  <Input
+                    placeholder="Enter pickup address"
+                    value={pickupAddress}
+                    onChange={(e) => setPickupAddress(e.target.value)}
+                  />
+                </div>
 
-              <div>
-                <Label htmlFor="dropoff" className="flex items-center gap-2 mb-2">
-                  <Navigation className="h-4 w-4 text-secondary" />
-                  Dropoff Location
-                </Label>
-                <Input
-                  id="dropoff"
-                  placeholder="Enter dropoff address"
-                  value={dropoffAddress}
-                  onChange={(e) => setDropoffAddress(e.target.value)}
-                />
-              </div>
+                <div>
+                  <label className="text-sm font-medium mb-2 flex items-center gap-2">
+                    <Navigation className="h-4 w-4 text-secondary" />
+                    Dropoff Location
+                  </label>
+                  <Input
+                    placeholder="Enter dropoff address"
+                    value={dropoffAddress}
+                    onChange={(e) => setDropoffAddress(e.target.value)}
+                  />
+                </div>
 
-              <Button 
-                onClick={handleBookRide} 
-                disabled={loading}
-                className="w-full"
-                size="lg"
-              >
-                {loading ? "Booking..." : "Book Ride"}
-              </Button>
-            </div>
+                <div className="mt-6 p-4 bg-muted rounded-lg">
+                  <h3 className="font-semibold mb-2 text-foreground">Estimated Fare</h3>
+                  <p className="text-2xl font-bold text-primary">KES 500 - 1,500</p>
+                  <p className="text-sm text-muted-foreground mt-1">Based on distance and traffic</p>
+                </div>
 
-              <div className="mt-8 p-4 bg-muted rounded-lg">
-                <h3 className="font-semibold mb-2 text-foreground">Estimated Fare</h3>
-                <p className="text-2xl font-bold text-primary">KES 500 - 1,500</p>
-                <p className="text-sm text-muted-foreground mt-1">Based on distance and traffic</p>
-              </div>
+                <Button 
+                  onClick={handleBookRide} 
+                  className="w-full"
+                  size="lg"
+                  disabled={loading || !pickupAddress || !dropoffAddress}
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Booking...
+                    </>
+                  ) : (
+                    <>
+                      <Navigation className="mr-2 h-4 w-4" />
+                      Book Ride
+                    </>
+                  )}
+                </Button>
+              </CardContent>
             </Card>
 
             {/* Recent Rides */}
-            <Card className="p-6 shadow-card">
-              <h2 className="text-2xl font-bold mb-6 text-foreground">Recent Rides</h2>
-              
-              {ridesLoading ? (
-                <div className="text-center py-8 text-muted-foreground">Loading...</div>
-              ) : rides.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  No rides yet. Book your first ride!
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {rides.slice(0, 5).map((ride) => (
-                    <div
-                      key={ride.id}
-                      className="p-4 border border-border rounded-lg hover:shadow-md transition-shadow"
-                    >
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <MapPin className="h-4 w-4 text-primary" />
-                            <span className="font-medium text-sm">{ride.pickup_address}</span>
+            <Card className="shadow-card">
+              <CardHeader>
+                <CardTitle className="text-2xl">Recent Rides</CardTitle>
+                <CardDescription>Your ride history and current bookings</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {ridesLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  </div>
+                ) : rides.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <MapPin className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                    <p>No rides yet. Book your first ride!</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {rides.map((ride) => (
+                      <Card key={ride.id} className="hover:shadow-hover transition-shadow">
+                        <CardContent className="pt-6">
+                          <div className="space-y-3">
+                            <div className="flex justify-between items-start">
+                              <div className="space-y-1 flex-1">
+                                <p className="text-sm font-medium flex items-center gap-2">
+                                  <MapPin className="h-4 w-4 text-primary" />
+                                  {ride.pickup_address}
+                                </p>
+                                <p className="text-sm text-muted-foreground flex items-center gap-2">
+                                  <Navigation className="h-4 w-4 text-secondary" />
+                                  {ride.dropoff_address}
+                                </p>
+                              </div>
+                              {getStatusBadge(ride.status)}
+                            </div>
+                            <div className="flex justify-between items-center text-sm pt-3 border-t">
+                              <span className="text-muted-foreground flex items-center gap-2">
+                                <Clock className="h-3 w-3" />
+                                {new Date(ride.created_at).toLocaleDateString()}
+                              </span>
+                              <span className="font-semibold text-primary">
+                                KES {ride.actual_fare || ride.estimated_fare}
+                              </span>
+                            </div>
+                            {ride.status === 'pending' && (
+                              <Button 
+                                variant="destructive" 
+                                size="sm" 
+                                className="w-full"
+                                onClick={() => handleCancelRide(ride.id)}
+                              >
+                                <XCircle className="mr-2 h-4 w-4" />
+                                Cancel Ride
+                              </Button>
+                            )}
                           </div>
-                          <div className="flex items-center gap-2">
-                            <Navigation className="h-4 w-4 text-secondary" />
-                            <span className="font-medium text-sm">{ride.dropoff_address}</span>
-                          </div>
-                        </div>
-                        {getStatusBadge(ride.status)}
-                      </div>
-                      
-                      <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Clock className="h-3 w-3" />
-                          {new Date(ride.created_at).toLocaleDateString()}
-                        </div>
-                        <div className="font-bold text-primary">
-                          KES {ride.actual_fare || ride.estimated_fare}
-                        </div>
-                      </div>
-                      
-                      {ride.status === "completed" && (
-                        <div className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
-                          <CheckCircle className="h-3 w-3" />
-                          Completed
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
             </Card>
           </div>
 
-          {/* Map */}
-          <Card className="p-6 shadow-card overflow-hidden h-fit sticky top-8">
-            <h2 className="text-2xl font-bold mb-4 text-foreground">Live Map</h2>
-            <div className="rounded-lg overflow-hidden border border-border" style={{ height: '600px' }}>
-              <MapContainer
-                center={[-1.2921, 36.8219] as [number, number]}
-                zoom={13}
-                style={{ height: '100%', width: '100%' }}
-              >
-                <TileLayer
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                <Marker position={[-1.2921, 36.8219] as [number, number]}>
-                  <Popup>Your Location</Popup>
-                </Marker>
-              </MapContainer>
-            </div>
-          </Card>
+          {/* Right Column - Map */}
+          <div className="lg:col-span-1">
+            <Card className="shadow-card sticky top-24">
+              <CardHeader>
+                <CardTitle className="text-2xl flex items-center gap-2">
+                  <Map className="h-6 w-6 text-primary" />
+                  Live Map
+                </CardTitle>
+                <CardDescription>Your current location</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="rounded-lg overflow-hidden border" style={{ height: '500px' }}>
+                  <MapContainer
+                    center={[-1.2921, 36.8219]}
+                    zoom={13}
+                    style={{ height: '100%', width: '100%' }}
+                  >
+                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                    <Marker position={[-1.2921, 36.8219]}>
+                      <Popup>Your Location</Popup>
+                    </Marker>
+                  </MapContainer>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </main>
     </div>

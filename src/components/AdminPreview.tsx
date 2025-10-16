@@ -87,6 +87,7 @@ export const AdminPreview = () => {
             variant="secondary" 
             size="lg"
             className="shadow-hover hover:scale-105 transition-transform"
+            onClick={() => window.location.href = "/auth"}
           >
             Request Admin Access
           </Button>

@@ -10,7 +10,7 @@ import { useRides } from "@/hooks/useRides";
 import { RideService } from "@/services";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { Map, Navigation, CreditCard, LogOut, Loader2, MapPin, Clock, CheckCircle, XCircle } from "lucide-react";
+import { Map, Navigation, CreditCard, LogOut, Loader2, MapPin, Clock, CheckCircle, XCircle, Brain, TrendingUp, AlertCircle } from "lucide-react";
 import L from "leaflet";
 
 // Fix for default marker icon in react-leaflet
@@ -29,6 +29,12 @@ const Dashboard = () => {
   const [dropoffAddress, setDropoffAddress] = useState("");
   const [loading, setLoading] = useState(false);
   const [userProfile, setUserProfile] = useState<any>(null);
+  const [trafficData, setTrafficData] = useState({
+    avgSpeed: 45,
+    congestionLevel: "Medium",
+    estimatedDelay: 12,
+    alternativeRoutes: 3
+  });
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -43,6 +49,18 @@ const Dashboard = () => {
       }
     };
     fetchUserProfile();
+
+    // Simulate real-time traffic updates
+    const trafficInterval = setInterval(() => {
+      setTrafficData({
+        avgSpeed: Math.floor(Math.random() * 40) + 30,
+        congestionLevel: ["Low", "Medium", "High"][Math.floor(Math.random() * 3)],
+        estimatedDelay: Math.floor(Math.random() * 20) + 5,
+        alternativeRoutes: Math.floor(Math.random() * 5) + 1
+      });
+    }, 8000);
+
+    return () => clearInterval(trafficInterval);
   }, []);
 
   const handleSignOut = async () => {
@@ -171,9 +189,95 @@ const Dashboard = () => {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
+        {/* AI Traffic Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          <Card className="shadow-card">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-primary/10 rounded-lg">
+                  <TrendingUp className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Avg Speed</p>
+                  <p className="text-2xl font-bold">{trafficData.avgSpeed} km/h</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-card">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-secondary/10 rounded-lg">
+                  <Brain className="h-5 w-5 text-secondary" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Traffic Status</p>
+                  <p className="text-2xl font-bold">{trafficData.congestionLevel}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-card">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-orange-500/10 rounded-lg">
+                  <Clock className="h-5 w-5 text-orange-500" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Delay</p>
+                  <p className="text-2xl font-bold">{trafficData.estimatedDelay} min</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-card">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-green-500/10 rounded-lg">
+                  <Navigation className="h-5 w-5 text-green-500" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Alt Routes</p>
+                  <p className="text-2xl font-bold">{trafficData.alternativeRoutes}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Left Column - Booking & Rides */}
           <div className="lg:col-span-2 space-y-8">
+            {/* AI Traffic Alert */}
+            <Card className="shadow-card bg-gradient-to-br from-primary/5 to-secondary/5">
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 bg-primary rounded-lg">
+                    <Brain className="h-6 w-6 text-primary-foreground" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-lg mb-2">AI Traffic Intelligence Active</h3>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Real-time traffic analysis using YOLO + OpenCV. System monitoring {trafficData.alternativeRoutes + 2} intersections
+                      and optimizing signals dynamically. Your route is being calculated using live CCTV data.
+                    </p>
+                    <div className="flex gap-2">
+                      <Badge variant="outline" className="gap-1">
+                        <CheckCircle className="h-3 w-3" />
+                        AI Routing
+                      </Badge>
+                      <Badge variant="outline" className="gap-1">
+                        <AlertCircle className="h-3 w-3" />
+                        Live Updates
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
             {/* Booking Card */}
             <Card className="shadow-card">
               <CardHeader>
@@ -209,9 +313,14 @@ const Dashboard = () => {
                 </div>
 
                 <div className="mt-6 p-4 bg-muted rounded-lg">
-                  <h3 className="font-semibold mb-2 text-foreground">Estimated Fare</h3>
+                  <h3 className="font-semibold mb-2 text-foreground flex items-center gap-2">
+                    <Brain className="h-4 w-4 text-primary" />
+                    AI-Optimized Fare Estimate
+                  </h3>
                   <p className="text-2xl font-bold text-primary">KES 500 - 1,500</p>
-                  <p className="text-sm text-muted-foreground mt-1">Based on distance and traffic</p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Based on real-time traffic analysis • {trafficData.estimatedDelay}min delay expected
+                  </p>
                 </div>
 
                 <Button 

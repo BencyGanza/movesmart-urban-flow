@@ -56,10 +56,10 @@ export const Hero = () => {
               variant="outline" 
               size="lg" 
               className="min-w-[200px] bg-background/10 backdrop-blur-sm border-background/30 text-primary-foreground hover:bg-background/20"
-              onClick={() => navigate("/auth")}
+              onClick={() => navigate("/traffic-control")}
             >
               <Shield className="w-5 h-5" />
-              Get Started
+              View AI Traffic System
             </Button>
           </div>
           

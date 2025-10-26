@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, Polyline, Circle } from "react-leaflet";
 import L from "leaflet";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, Car, Navigation } from "lucide-react";
+import { AlertTriangle, Car } from "lucide-react";
 
 interface TrafficData {
   intersections: Array<{
@@ -94,14 +92,20 @@ const TrafficMap = () => {
             icon={getMarkerIcon(intersection.congestion)}
           >
             <Popup>
-              <div className="p-3">
-                <h3 className="font-semibold mb-2">{intersection.name}</h3>
-                <div className="space-y-1 text-sm">
-                  <Badge variant={intersection.congestion === "high" ? "destructive" : "secondary"}>
+              <div className="p-3 min-w-[200px]">
+                <h3 className="font-semibold mb-2 text-base">{intersection.name}</h3>
+                <div className="space-y-2 text-sm">
+                  <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
+                    intersection.congestion === "high" 
+                      ? "bg-red-100 text-red-800" 
+                      : intersection.congestion === "medium"
+                      ? "bg-yellow-100 text-yellow-800"
+                      : "bg-green-100 text-green-800"
+                  }`}>
                     {intersection.congestion.toUpperCase()}
-                  </Badge>
-                  <p className="flex items-center gap-1 text-muted-foreground mt-2">
-                    <Car className="h-3 w-3" />
+                  </span>
+                  <p className="flex items-center gap-1 text-gray-600">
+                    <span>🚗</span>
                     {intersection.vehicles} vehicles
                   </p>
                 </div>
@@ -140,12 +144,12 @@ const TrafficMap = () => {
             icon={incidentIcon}
           >
             <Popup>
-              <div className="p-3">
+              <div className="p-3 min-w-[200px]">
                 <div className="flex items-center gap-2 mb-2">
-                  <AlertTriangle className="h-4 w-4 text-red-500" />
-                  <h3 className="font-semibold">{incident.type}</h3>
+                  <span className="text-red-500">⚠️</span>
+                  <h3 className="font-semibold text-base">{incident.type}</h3>
                 </div>
-                <p className="text-sm text-muted-foreground">{incident.description}</p>
+                <p className="text-sm text-gray-600">{incident.description}</p>
               </div>
             </Popup>
           </Marker>

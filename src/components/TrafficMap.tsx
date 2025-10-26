@@ -86,12 +86,7 @@ const TrafficMap = () => {
         style={{ height: "100%", width: "100%" }}
         zoomControl={true}
       >
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        />
-
-        {/* Traffic Intersections */}
+        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         {trafficData.intersections.map((intersection) => (
           <Marker
             key={intersection.id}
@@ -99,27 +94,21 @@ const TrafficMap = () => {
             icon={getMarkerIcon(intersection.congestion)}
           >
             <Popup>
-              <Card className="border-0 shadow-none">
-                <CardContent className="p-3">
-                  <h3 className="font-semibold mb-2">{intersection.name}</h3>
-                  <div className="space-y-1 text-sm">
-                    <div className="flex items-center gap-2">
-                      <Badge variant={intersection.congestion === "high" ? "destructive" : "secondary"}>
-                        {intersection.congestion.toUpperCase()}
-                      </Badge>
-                    </div>
-                    <p className="flex items-center gap-1 text-muted-foreground">
-                      <Car className="h-3 w-3" />
-                      {intersection.vehicles} vehicles
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="p-3">
+                <h3 className="font-semibold mb-2">{intersection.name}</h3>
+                <div className="space-y-1 text-sm">
+                  <Badge variant={intersection.congestion === "high" ? "destructive" : "secondary"}>
+                    {intersection.congestion.toUpperCase()}
+                  </Badge>
+                  <p className="flex items-center gap-1 text-muted-foreground mt-2">
+                    <Car className="h-3 w-3" />
+                    {intersection.vehicles} vehicles
+                  </p>
+                </div>
+              </div>
             </Popup>
           </Marker>
         ))}
-
-        {/* Congestion Circles */}
         {trafficData.intersections.map((intersection) => (
           <Circle
             key={`circle_${intersection.id}`}
@@ -133,8 +122,6 @@ const TrafficMap = () => {
             }}
           />
         ))}
-
-        {/* Traffic Routes */}
         {trafficData.routes.map((route) => (
           <Polyline
             key={route.id}
@@ -146,8 +133,6 @@ const TrafficMap = () => {
             }}
           />
         ))}
-
-        {/* Incidents */}
         {trafficData.incidents.map((incident) => (
           <Marker
             key={incident.id}
@@ -155,15 +140,13 @@ const TrafficMap = () => {
             icon={incidentIcon}
           >
             <Popup>
-              <Card className="border-0 shadow-none">
-                <CardContent className="p-3">
-                  <div className="flex items-center gap-2 mb-2">
-                    <AlertTriangle className="h-4 w-4 text-red-500" />
-                    <h3 className="font-semibold">{incident.type}</h3>
-                  </div>
-                  <p className="text-sm text-muted-foreground">{incident.description}</p>
-                </CardContent>
-              </Card>
+              <div className="p-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <AlertTriangle className="h-4 w-4 text-red-500" />
+                  <h3 className="font-semibold">{incident.type}</h3>
+                </div>
+                <p className="text-sm text-muted-foreground">{incident.description}</p>
+              </div>
             </Popup>
           </Marker>
         ))}

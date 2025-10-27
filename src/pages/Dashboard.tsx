@@ -8,18 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useRides } from "@/hooks/useRides";
 import { RideService } from "@/services";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
 import { Map, Navigation, CreditCard, LogOut, Loader2, MapPin, Clock, CheckCircle, XCircle, Brain, TrendingUp, AlertCircle } from "lucide-react";
-import L from "leaflet";
-
-// Fix for default marker icon in react-leaflet
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
-  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
-  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
-});
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -409,29 +398,41 @@ const Dashboard = () => {
             </Card>
           </div>
 
-          {/* Right Column - Map */}
+          {/* Right Column - Quick Stats */}
           <div className="lg:col-span-1">
             <Card className="shadow-card sticky top-24">
               <CardHeader>
                 <CardTitle className="text-2xl flex items-center gap-2">
-                  <Map className="h-6 w-6 text-primary" />
-                  Live Map
+                  <Brain className="h-6 w-6 text-primary" />
+                  AI Traffic Center
                 </CardTitle>
-                <CardDescription>Your current location</CardDescription>
+                <CardDescription>Real-time traffic monitoring</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="rounded-lg overflow-hidden border" style={{ height: '500px' }}>
-                  <MapContainer
-                    center={[-1.2921, 36.8219]}
-                    zoom={13}
-                    style={{ height: '100%', width: '100%' }}
-                  >
-                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                    <Marker position={[-1.2921, 36.8219]}>
-                      <Popup>Your Location</Popup>
-                    </Marker>
-                  </MapContainer>
+              <CardContent className="space-y-4">
+                <div className="p-4 bg-primary/5 rounded-lg">
+                  <p className="text-sm font-medium mb-2">📍 Nairobi, Kenya</p>
+                  <p className="text-xs text-muted-foreground">Current Location</p>
                 </div>
+                
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
+                    <span className="text-sm">Active Cameras</span>
+                    <Badge>24</Badge>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
+                    <span className="text-sm">Intersections Monitored</span>
+                    <Badge>{trafficData.alternativeRoutes + 2}</Badge>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
+                    <span className="text-sm">Emergency Vehicles</span>
+                    <Badge variant="destructive">2 Active</Badge>
+                  </div>
+                </div>
+
+                <Button variant="outline" className="w-full" onClick={() => navigate('/traffic-control')}>
+                  <AlertCircle className="mr-2 h-4 w-4" />
+                  View Traffic Control
+                </Button>
               </CardContent>
             </Card>
           </div>

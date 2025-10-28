@@ -3,12 +3,14 @@ import { Features } from "@/components/Features";
 import { HowItWorks } from "@/components/HowItWorks";
 import { AdminPreview } from "@/components/AdminPreview";
 import { Footer } from "@/components/Footer";
+import { Header } from "@/components/Header";
 import AITrafficConcept from "@/components/AITrafficConcept";
 import EmergencyVehicleTracker from "@/components/EmergencyVehicleTracker";
 
 const Index = () => {
   return (
     <div className="min-h-screen">
+      <Header />
       <Hero />
       
       {/* AI Traffic Management Concept */}

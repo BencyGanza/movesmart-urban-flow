@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useRides } from "@/hooks/useRides";
 import { RideService } from "@/services";
+import { Header } from "@/components/Header";
 import { Map, Navigation, CreditCard, LogOut, Loader2, MapPin, Clock, CheckCircle, XCircle, Brain, TrendingUp, AlertCircle } from "lucide-react";
 
 const Dashboard = () => {
@@ -160,8 +161,9 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b bg-card shadow-card sticky top-0 z-50">
+      <Header />
+      {/* Dashboard Header */}
+      <header className="border-b bg-card shadow-card sticky top-16 z-40">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-bold text-primary">MoveSmart</h1>

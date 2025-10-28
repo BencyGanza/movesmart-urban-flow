@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, MapPin } from "lucide-react";
+import { Header } from "@/components/Header";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -145,9 +146,11 @@ const Auth = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-hero p-4">
-      <Card className="w-full max-w-md shadow-hover">
-        <CardHeader className="text-center">
+    <>
+      <Header />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-hero p-4 pt-24">
+        <Card className="w-full max-w-md shadow-hover">
+          <CardHeader className="text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
             <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
               <MapPin className="h-7 w-7 text-primary-foreground" />
@@ -272,6 +275,7 @@ const Auth = () => {
         </CardContent>
       </Card>
     </div>
+    </>
   );
 };
 

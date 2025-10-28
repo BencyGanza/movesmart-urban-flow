@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { Header } from "@/components/Header";
 import { 
   Camera, 
   Activity, 
@@ -135,8 +136,9 @@ const TrafficControl = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b bg-card shadow-card sticky top-0 z-50">
+      <Header />
+      {/* Traffic Control Header */}
+      <header className="border-b bg-card shadow-card sticky top-16 z-40">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div>

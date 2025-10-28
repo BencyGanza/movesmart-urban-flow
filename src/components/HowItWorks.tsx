@@ -1,4 +1,6 @@
-import { Search, MapPin, CreditCard, Star } from "lucide-react";
+import { Search, MapPin, CreditCard, Star, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const steps = [
   {
@@ -28,6 +30,8 @@ const steps = [
 ];
 
 export const HowItWorks = () => {
+  const navigate = useNavigate();
+  
   return (
     <section className="py-24 bg-muted/30">
       <div className="container mx-auto px-4">
@@ -43,7 +47,7 @@ export const HowItWorks = () => {
         </div>
         
         {/* Steps */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 relative">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 relative mb-12">
           {/* Connection Line (hidden on mobile) */}
           <div className="hidden lg:block absolute top-20 left-0 right-0 h-0.5 bg-gradient-hero opacity-30" 
                style={{ width: 'calc(100% - 8rem)', left: '4rem' }} 
@@ -52,20 +56,21 @@ export const HowItWorks = () => {
           {steps.map((step, index) => (
             <div 
               key={index}
-              className="relative text-center space-y-4 animate-slide-up"
+              className="relative text-center space-y-4 animate-slide-up cursor-pointer group"
               style={{ animationDelay: `${index * 150}ms` }}
+              onClick={() => navigate("/auth")}
             >
               {/* Number Badge */}
               <div className="relative inline-flex items-center justify-center">
-                <div className="absolute w-24 h-24 bg-gradient-hero opacity-20 rounded-full blur-xl" />
-                <div className="relative w-20 h-20 bg-gradient-hero rounded-full flex items-center justify-center text-2xl font-bold text-primary-foreground shadow-hover">
+                <div className="absolute w-24 h-24 bg-gradient-hero opacity-20 rounded-full blur-xl group-hover:opacity-30 transition-opacity" />
+                <div className="relative w-20 h-20 bg-gradient-hero rounded-full flex items-center justify-center text-2xl font-bold text-primary-foreground shadow-hover group-hover:scale-110 transition-transform">
                   {step.number}
                 </div>
               </div>
               
               {/* Icon */}
               <div className="flex justify-center">
-                <div className="w-14 h-14 bg-background rounded-xl shadow-card flex items-center justify-center">
+                <div className="w-14 h-14 bg-background rounded-xl shadow-card flex items-center justify-center group-hover:shadow-hover transition-shadow">
                   <step.icon className="w-7 h-7 text-primary" />
                 </div>
               </div>
@@ -81,6 +86,19 @@ export const HowItWorks = () => {
               </div>
             </div>
           ))}
+        </div>
+        
+        {/* CTA Button */}
+        <div className="text-center">
+          <Button 
+            size="lg" 
+            variant="hero"
+            onClick={() => navigate("/auth")}
+            className="min-w-[250px]"
+          >
+            Start Your First Ride
+            <ArrowRight className="w-5 h-5" />
+          </Button>
         </div>
       </div>
     </section>

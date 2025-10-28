@@ -1,5 +1,7 @@
 import { Card } from "@/components/ui/card";
-import { MapPin, CreditCard, Shield, Route, Clock, Star } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { MapPin, CreditCard, Shield, Route, Clock, Star, ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import trackingImage from "@/assets/feature-tracking.jpg";
 import paymentImage from "@/assets/feature-payment.jpg";
 import safetyImage from "@/assets/feature-safety.jpg";
@@ -44,6 +46,8 @@ const features = [
 ];
 
 export const Features = () => {
+  const navigate = useNavigate();
+  
   return (
     <section className="py-24 bg-background">
       <div className="container mx-auto px-4">
@@ -64,8 +68,9 @@ export const Features = () => {
           {features.map((feature, index) => (
             <Card 
               key={index}
-              className="group p-8 bg-gradient-card border-border hover:shadow-hover transition-all duration-300 hover:-translate-y-2"
+              className="group p-8 bg-gradient-card border-border hover:shadow-hover transition-all duration-300 hover:-translate-y-2 cursor-pointer"
               style={{ animationDelay: `${index * 100}ms` }}
+              onClick={() => navigate("/auth")}
             >
               {/* Icon with Image Background */}
               <div className="relative mb-6">
@@ -82,9 +87,15 @@ export const Features = () => {
               <h3 className="text-xl font-bold text-card-foreground mb-3">
                 {feature.title}
               </h3>
-              <p className="text-muted-foreground leading-relaxed">
+              <p className="text-muted-foreground leading-relaxed mb-4">
                 {feature.description}
               </p>
+              
+              {/* CTA */}
+              <div className="flex items-center gap-2 text-primary font-medium group-hover:gap-3 transition-all">
+                <span>Get Started</span>
+                <ArrowRight className="w-4 h-4" />
+              </div>
             </Card>
           ))}
         </div>

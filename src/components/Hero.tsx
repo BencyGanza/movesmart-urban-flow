@@ -1,10 +1,34 @@
 import { Button } from "@/components/ui/button";
 import { MapPin, Navigation, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
 import heroImage from "@/assets/hero-transport.jpg";
 
 export const Hero = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsAuthenticated(!!session);
+    });
+  }, []);
+  
+  const handleTrafficControlClick = () => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to access the AI Traffic Control Center",
+        variant: "destructive",
+      });
+      setTimeout(() => navigate("/auth"), 1000);
+    } else {
+      navigate("/traffic-control");
+    }
+  };
   
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-hero">
@@ -56,7 +80,7 @@ export const Hero = () => {
               variant="outline" 
               size="lg" 
               className="min-w-[200px] bg-background/10 backdrop-blur-sm border-background/30 text-primary-foreground hover:bg-background/20"
-              onClick={() => navigate("/traffic-control")}
+              onClick={handleTrafficControlClick}
             >
               <Shield className="w-5 h-5" />
               View AI Traffic System

@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BarChart3, Users, MapPinned, TrendingUp, Shield, Settings } from "lucide-react";
+import { BarChart3, Users, MapPinned, TrendingUp, Shield, Settings, ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const adminFeatures = [
   {
@@ -26,6 +27,8 @@ const adminFeatures = [
 ];
 
 export const AdminPreview = () => {
+  const navigate = useNavigate();
+  
   return (
     <section className="py-24 bg-gradient-to-br from-background via-muted/20 to-background relative overflow-hidden">
       {/* Background Decoration */}
@@ -54,15 +57,17 @@ export const AdminPreview = () => {
           {adminFeatures.map((feature, index) => (
             <Card 
               key={index}
-              className="p-6 bg-card border-border hover:shadow-card transition-all duration-300 hover:border-primary/50"
+              className="p-6 bg-card border-border hover:shadow-card transition-all duration-300 hover:border-primary/50 cursor-pointer group"
+              onClick={() => navigate("/auth")}
             >
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-gradient-hero rounded-lg flex items-center justify-center flex-shrink-0">
+                <div className="w-12 h-12 bg-gradient-hero rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
                   <feature.icon className="w-6 h-6 text-primary-foreground" />
                 </div>
-                <div className="space-y-2">
-                  <h3 className="text-lg font-bold text-card-foreground">
+                <div className="space-y-2 flex-1">
+                  <h3 className="text-lg font-bold text-card-foreground flex items-center justify-between">
                     {feature.title}
+                    <ArrowRight className="w-4 h-4 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
                   </h3>
                   <p className="text-muted-foreground text-sm">
                     {feature.description}
@@ -86,10 +91,11 @@ export const AdminPreview = () => {
           <Button 
             variant="secondary" 
             size="lg"
-            className="shadow-hover hover:scale-105 transition-transform"
-            onClick={() => window.location.href = "/auth"}
+            className="shadow-hover hover:scale-105 transition-transform min-w-[250px]"
+            onClick={() => navigate("/auth")}
           >
             Request Admin Access
+            <ArrowRight className="w-5 h-5" />
           </Button>
         </Card>
       </div>

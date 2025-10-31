@@ -51,6 +51,12 @@ export const Header = () => {
             <Link to="/" className="text-sm font-medium hover:text-primary transition-colors">
               Home
             </Link>
+            <Link to="/about" className="text-sm font-medium hover:text-primary transition-colors">
+              About
+            </Link>
+            <Link to="/help" className="text-sm font-medium hover:text-primary transition-colors">
+              Help
+            </Link>
             {isAuthenticated && (
               <>
                 <Link to="/dashboard" className="text-sm font-medium hover:text-primary transition-colors">

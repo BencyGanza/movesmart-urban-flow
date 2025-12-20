@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup, Polyline, Circle } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, Polyline, Circle, useMap } from "react-leaflet";
 import L from "leaflet";
-import { AlertTriangle, Car } from "lucide-react";
+import { AlertTriangle, Car, Navigation } from "lucide-react";
+
+interface UserLocation {
+  lat: number;
+  lng: number;
+  accuracy: number;
+}
 
 interface TrafficData {
   intersections: Array<{
@@ -24,7 +30,22 @@ interface TrafficData {
   }>;
 }
 
+// Component to recenter map on user location
+const RecenterMap = ({ position }: { position: [number, number] | null }) => {
+  const map = useMap();
+  
+  useEffect(() => {
+    if (position) {
+      map.setView(position, 14);
+    }
+  }, [position, map]);
+  
+  return null;
+};
+
 const TrafficMap = () => {
+  const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
   const [trafficData, setTrafficData] = useState<TrafficData>({
     intersections: [
       { id: "int_001", name: "Uhuru Highway", position: [-1.2864, 36.8172], congestion: "high", vehicles: 156 },
@@ -49,6 +70,47 @@ const TrafficMap = () => {
     ]
   });
 
+  // Get user's current location
+  useEffect(() => {
+    if (!navigator.geolocation) {
+      setLocationError("Geolocation is not supported by your browser");
+      return;
+    }
+
+    const watchId = navigator.geolocation.watchPosition(
+      (position) => {
+        setUserLocation({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+          accuracy: position.coords.accuracy
+        });
+        setLocationError(null);
+      },
+      (error) => {
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            setLocationError("Location permission denied");
+            break;
+          case error.POSITION_UNAVAILABLE:
+            setLocationError("Location unavailable");
+            break;
+          case error.TIMEOUT:
+            setLocationError("Location request timed out");
+            break;
+          default:
+            setLocationError("Unknown location error");
+        }
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      }
+    );
+
+    return () => navigator.geolocation.clearWatch(watchId);
+  }, []);
+
   const getCongestionColor = (level: string) => {
     switch (level) {
       case "high": return "#ef4444";
@@ -67,6 +129,16 @@ const TrafficMap = () => {
     });
   };
 
+  const userLocationIcon = L.divIcon({
+    className: "user-location-marker",
+    html: `<div style="position: relative;">
+      <div style="background-color: #3b82f6; width: 20px; height: 20px; border-radius: 50%; border: 4px solid white; box-shadow: 0 2px 10px rgba(59,130,246,0.5); animation: pulse 2s infinite;"></div>
+      <div style="position: absolute; top: -2px; left: -2px; width: 24px; height: 24px; border-radius: 50%; border: 2px solid #3b82f6; animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>
+    </div>`,
+    iconSize: [24, 24],
+    iconAnchor: [12, 12]
+  });
+
   const incidentIcon = L.divIcon({
     className: "incident-marker",
     html: `<div style="background-color: #dc2626; width: 32px; height: 32px; border-radius: 50%; border: 3px solid white; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
@@ -78,13 +150,55 @@ const TrafficMap = () => {
 
   return (
     <div className="h-full w-full rounded-lg overflow-hidden border shadow-card">
+      {locationError && (
+        <div className="absolute top-4 left-4 z-[1000] bg-destructive/90 text-destructive-foreground px-4 py-2 rounded-lg text-sm flex items-center gap-2 shadow-lg">
+          <Navigation className="w-4 h-4" />
+          {locationError}
+        </div>
+      )}
       <MapContainer
-        center={[-1.2864, 36.8219]}
-        zoom={12}
+        center={userLocation ? [userLocation.lat, userLocation.lng] : [-1.2864, 36.8219]}
+        zoom={userLocation ? 14 : 12}
         style={{ height: "100%", width: "100%" }}
         zoomControl={true}
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        
+        {/* User's current location */}
+        {userLocation && (
+          <>
+            <RecenterMap position={null} />
+            <Circle
+              center={[userLocation.lat, userLocation.lng]}
+              radius={userLocation.accuracy}
+              pathOptions={{
+                color: "#3b82f6",
+                fillColor: "#3b82f6",
+                fillOpacity: 0.15,
+                weight: 2
+              }}
+            />
+            <Marker
+              position={[userLocation.lat, userLocation.lng]}
+              icon={userLocationIcon}
+            >
+              <Popup>
+                <div className="p-3 min-w-[200px]">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Navigation className="w-5 h-5 text-blue-500" />
+                    <h3 className="font-semibold text-base">Your Location</h3>
+                  </div>
+                  <div className="space-y-1 text-sm text-gray-600">
+                    <p>Lat: {userLocation.lat.toFixed(6)}</p>
+                    <p>Lng: {userLocation.lng.toFixed(6)}</p>
+                    <p>Accuracy: ±{Math.round(userLocation.accuracy)}m</p>
+                  </div>
+                </div>
+              </Popup>
+            </Marker>
+          </>
+        )}
+        
         {trafficData.intersections.map((intersection) => (
           <Marker
             key={intersection.id}

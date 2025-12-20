@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from "react-leaflet";
-import L from "leaflet";
+import { useEffect, useRef, useState } from "react";
+import mapboxgl from "mapbox-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
 import { Navigation, Loader2, MapPin, Locate } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useMapboxToken } from "@/hooks/useMapboxToken";
 
 interface UserLocation {
   lat: number;
@@ -10,30 +11,14 @@ interface UserLocation {
   accuracy: number;
 }
 
-// Component to recenter map on user location
-const RecenterControl = ({ 
-  position, 
-  onRecenter 
-}: { 
-  position: [number, number] | null;
-  onRecenter: () => void;
-}) => {
-  const map = useMap();
-  
-  useEffect(() => {
-    if (position) {
-      map.setView(position, 16, { animate: true });
-    }
-  }, [position, map]);
-  
-  return null;
-};
-
 const UserLocationMap = () => {
+  const mapContainer = useRef<HTMLDivElement>(null);
+  const map = useRef<mapboxgl.Map | null>(null);
+  const marker = useRef<mapboxgl.Marker | null>(null);
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [isLocating, setIsLocating] = useState(true);
-  const [mapKey, setMapKey] = useState(0);
+  const { token, loading: tokenLoading, error: tokenError } = useMapboxToken();
 
   // Get user's current location
   useEffect(() => {
@@ -79,31 +64,97 @@ const UserLocationMap = () => {
     return () => navigator.geolocation.clearWatch(watchId);
   }, []);
 
-  const userLocationIcon = L.divIcon({
-    className: "user-location-marker",
-    html: `
-      <div style="position: relative; display: flex; align-items: center; justify-content: center;">
-        <div style="position: absolute; width: 48px; height: 48px; background: rgba(59, 130, 246, 0.2); border-radius: 50%; animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>
-        <div style="position: absolute; width: 32px; height: 32px; background: rgba(59, 130, 246, 0.3); border-radius: 50%; animation: pulse 2s ease-in-out infinite;"></div>
-        <div style="width: 16px; height: 16px; background: #3b82f6; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 8px rgba(59,130,246,0.5); z-index: 10;"></div>
-      </div>
-    `,
-    iconSize: [48, 48],
-    iconAnchor: [24, 24]
-  });
+  // Initialize map
+  useEffect(() => {
+    if (!mapContainer.current || !token || map.current) return;
+
+    mapboxgl.accessToken = token;
+
+    map.current = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: "mapbox://styles/mapbox/streets-v12",
+      center: userLocation ? [userLocation.lng, userLocation.lat] : [29.8739, -1.9403],
+      zoom: 15,
+    });
+
+    map.current.addControl(new mapboxgl.NavigationControl(), "top-left");
+
+    return () => {
+      map.current?.remove();
+      map.current = null;
+    };
+  }, [token]);
+
+  // Update marker when location changes
+  useEffect(() => {
+    if (!map.current || !userLocation) return;
+
+    if (!marker.current) {
+      // Create custom marker element
+      const el = document.createElement("div");
+      el.className = "user-marker";
+      el.innerHTML = `
+        <div style="position: relative; display: flex; align-items: center; justify-content: center;">
+          <div style="position: absolute; width: 48px; height: 48px; background: rgba(59, 130, 246, 0.2); border-radius: 50%; animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>
+          <div style="position: absolute; width: 32px; height: 32px; background: rgba(59, 130, 246, 0.3); border-radius: 50%; animation: pulse 2s ease-in-out infinite;"></div>
+          <div style="width: 16px; height: 16px; background: #3b82f6; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 8px rgba(59,130,246,0.5); z-index: 10;"></div>
+        </div>
+      `;
+
+      marker.current = new mapboxgl.Marker({ element: el })
+        .setLngLat([userLocation.lng, userLocation.lat])
+        .setPopup(
+          new mapboxgl.Popup({ offset: 25 }).setHTML(`
+            <div style="padding: 8px;">
+              <strong>Your Location</strong><br/>
+              <span style="font-size: 12px; color: #666;">
+                ${userLocation.lat.toFixed(6)}, ${userLocation.lng.toFixed(6)}<br/>
+                Accuracy: ±${Math.round(userLocation.accuracy)}m
+              </span>
+            </div>
+          `)
+        )
+        .addTo(map.current);
+    } else {
+      marker.current.setLngLat([userLocation.lng, userLocation.lat]);
+    }
+
+    map.current.flyTo({
+      center: [userLocation.lng, userLocation.lat],
+      zoom: 15,
+      essential: true
+    });
+  }, [userLocation]);
 
   const handleRecenter = () => {
-    if (userLocation) {
-      setMapKey(prev => prev + 1);
+    if (map.current && userLocation) {
+      map.current.flyTo({
+        center: [userLocation.lng, userLocation.lat],
+        zoom: 15,
+        essential: true
+      });
     }
   };
 
-  if (isLocating) {
+  if (tokenLoading || isLocating) {
     return (
       <div className="h-full w-full rounded-lg overflow-hidden border bg-muted flex items-center justify-center">
         <div className="text-center space-y-3">
           <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
-          <p className="text-sm text-muted-foreground">Getting your location...</p>
+          <p className="text-sm text-muted-foreground">
+            {tokenLoading ? "Loading map..." : "Getting your location..."}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (tokenError) {
+    return (
+      <div className="h-full w-full rounded-lg overflow-hidden border bg-muted flex items-center justify-center p-6">
+        <div className="text-center space-y-3">
+          <MapPin className="h-12 w-12 text-muted-foreground mx-auto opacity-50" />
+          <p className="text-sm text-muted-foreground">Map configuration error</p>
         </div>
       </div>
     );
@@ -129,14 +180,14 @@ const UserLocationMap = () => {
       <Button
         size="icon"
         variant="secondary"
-        className="absolute top-3 right-3 z-[1000] shadow-lg"
+        className="absolute top-3 right-3 z-10 shadow-lg"
         onClick={handleRecenter}
       >
         <Locate className="h-4 w-4" />
       </Button>
 
       {/* Location Info Overlay */}
-      <div className="absolute bottom-3 left-3 right-3 z-[1000] bg-card/95 backdrop-blur-sm rounded-lg p-3 shadow-lg">
+      <div className="absolute bottom-3 left-3 right-3 z-10 bg-card/95 backdrop-blur-sm rounded-lg p-3 shadow-lg">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-primary rounded-full">
             <Navigation className="h-4 w-4 text-primary-foreground" />
@@ -152,52 +203,7 @@ const UserLocationMap = () => {
         </div>
       </div>
 
-      <MapContainer
-        key={mapKey}
-        center={userLocation ? [userLocation.lat, userLocation.lng] : [-1.9403, 29.8739]}
-        zoom={16}
-        style={{ height: "100%", width: "100%" }}
-        zoomControl={true}
-      >
-        <TileLayer 
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        />
-        
-        {userLocation && (
-          <Circle
-            center={[userLocation.lat, userLocation.lng]}
-            radius={userLocation.accuracy}
-            pathOptions={{
-              color: "#3b82f6",
-              fillColor: "#3b82f6",
-              fillOpacity: 0.1,
-              weight: 1
-            }}
-          />
-        )}
-        
-        {userLocation && (
-          <Marker
-            position={[userLocation.lat, userLocation.lng]}
-            icon={userLocationIcon}
-          >
-            <Popup>
-              <div className="p-2 min-w-[180px]">
-                <div className="flex items-center gap-2 mb-2">
-                  <Navigation className="w-4 h-4 text-blue-500" />
-                  <span className="font-semibold text-sm">You are here</span>
-                </div>
-                <div className="text-xs text-gray-600 space-y-1">
-                  <p>Latitude: {userLocation.lat.toFixed(6)}</p>
-                  <p>Longitude: {userLocation.lng.toFixed(6)}</p>
-                  <p>Accuracy: ±{Math.round(userLocation.accuracy)} meters</p>
-                </div>
-              </div>
-            </Popup>
-          </Marker>
-        )}
-      </MapContainer>
+      <div ref={mapContainer} className="h-full w-full" />
     </div>
   );
 };

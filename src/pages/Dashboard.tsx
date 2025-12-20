@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useRides } from "@/hooks/useRides";
 import { RideService } from "@/services";
 import { Header } from "@/components/Header";
+import UserLocationMap from "@/components/UserLocationMap";
 import { Map, Navigation, CreditCard, LogOut, Loader2, MapPin, Clock, CheckCircle, XCircle, Brain, TrendingUp, AlertCircle } from "lucide-react";
 
 const Dashboard = () => {
@@ -400,22 +401,34 @@ const Dashboard = () => {
             </Card>
           </div>
 
-          {/* Right Column - Quick Stats */}
-          <div className="lg:col-span-1">
-            <Card className="shadow-card sticky top-24">
+          {/* Right Column - Map & Quick Stats */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* User Location Map */}
+            <Card className="shadow-card">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <MapPin className="h-5 w-5 text-primary" />
+                  Your Location
+                </CardTitle>
+                <CardDescription>Live GPS tracking</CardDescription>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="h-[300px] rounded-b-lg overflow-hidden">
+                  <UserLocationMap />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* AI Traffic Center */}
+            <Card className="shadow-card">
               <CardHeader>
-                <CardTitle className="text-2xl flex items-center gap-2">
-                  <Brain className="h-6 w-6 text-primary" />
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Brain className="h-5 w-5 text-primary" />
                   AI Traffic Center
                 </CardTitle>
                 <CardDescription>Real-time traffic monitoring</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="p-4 bg-primary/5 rounded-lg">
-                  <p className="text-sm font-medium mb-2">📍 Nairobi, Kenya</p>
-                  <p className="text-xs text-muted-foreground">Current Location</p>
-                </div>
-                
                 <div className="space-y-3">
                   <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
                     <span className="text-sm">Active Cameras</span>

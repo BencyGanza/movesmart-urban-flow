@@ -31,20 +31,21 @@ interface TrafficData {
 }
 
 // Component to recenter map on user location
-const RecenterMap = ({ position }: { position: [number, number] | null }) => {
+const RecenterMap = ({ position, shouldRecenter }: { position: [number, number] | null; shouldRecenter: boolean }) => {
   const map = useMap();
   
   useEffect(() => {
-    if (position) {
-      map.setView(position, 14);
+    if (position && shouldRecenter) {
+      map.setView(position, 14, { animate: true });
     }
-  }, [position, map]);
+  }, [position, shouldRecenter, map]);
   
   return null;
 };
 
 const TrafficMap = () => {
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
+  const [initialLocationSet, setInitialLocationSet] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [trafficData, setTrafficData] = useState<TrafficData>({
     intersections: [
@@ -85,6 +86,7 @@ const TrafficMap = () => {
           accuracy: position.coords.accuracy
         });
         setLocationError(null);
+        setInitialLocationSet(true);
       },
       (error) => {
         switch (error.code) {
@@ -164,10 +166,15 @@ const TrafficMap = () => {
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         
+        {/* Recenter map on first location */}
+        <RecenterMap 
+          position={userLocation ? [userLocation.lat, userLocation.lng] : null} 
+          shouldRecenter={!initialLocationSet && !!userLocation}
+        />
+        
         {/* User's current location */}
         {userLocation && (
           <>
-            <RecenterMap position={null} />
             <Circle
               center={[userLocation.lat, userLocation.lng]}
               radius={userLocation.accuracy}

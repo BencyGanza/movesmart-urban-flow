@@ -165,41 +165,37 @@ const UserLocationMap = () => {
         />
         
         {userLocation && (
-          <>
-            <RecenterControl position={null} onRecenter={handleRecenter} />
-            
-            {/* Accuracy circle */}
-            <Circle
-              center={[userLocation.lat, userLocation.lng]}
-              radius={userLocation.accuracy}
-              pathOptions={{
-                color: "#3b82f6",
-                fillColor: "#3b82f6",
-                fillOpacity: 0.1,
-                weight: 1
-              }}
-            />
-            
-            {/* User marker */}
-            <Marker
-              position={[userLocation.lat, userLocation.lng]}
-              icon={userLocationIcon}
-            >
-              <Popup>
-                <div className="p-2 min-w-[180px]">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Navigation className="w-4 h-4 text-blue-500" />
-                    <span className="font-semibold text-sm">You are here</span>
-                  </div>
-                  <div className="text-xs text-gray-600 space-y-1">
-                    <p>Latitude: {userLocation.lat.toFixed(6)}</p>
-                    <p>Longitude: {userLocation.lng.toFixed(6)}</p>
-                    <p>Accuracy: ±{Math.round(userLocation.accuracy)} meters</p>
-                  </div>
+          <Circle
+            center={[userLocation.lat, userLocation.lng]}
+            radius={userLocation.accuracy}
+            pathOptions={{
+              color: "#3b82f6",
+              fillColor: "#3b82f6",
+              fillOpacity: 0.1,
+              weight: 1
+            }}
+          />
+        )}
+        
+        {userLocation && (
+          <Marker
+            position={[userLocation.lat, userLocation.lng]}
+            icon={userLocationIcon}
+          >
+            <Popup>
+              <div className="p-2 min-w-[180px]">
+                <div className="flex items-center gap-2 mb-2">
+                  <Navigation className="w-4 h-4 text-blue-500" />
+                  <span className="font-semibold text-sm">You are here</span>
                 </div>
-              </Popup>
-            </Marker>
-          </>
+                <div className="text-xs text-gray-600 space-y-1">
+                  <p>Latitude: {userLocation.lat.toFixed(6)}</p>
+                  <p>Longitude: {userLocation.lng.toFixed(6)}</p>
+                  <p>Accuracy: ±{Math.round(userLocation.accuracy)} meters</p>
+                </div>
+              </div>
+            </Popup>
+          </Marker>
         )}
       </MapContainer>
     </div>

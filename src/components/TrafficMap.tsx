@@ -172,38 +172,40 @@ const TrafficMap = () => {
           shouldRecenter={!initialLocationSet && !!userLocation}
         />
         
-        {/* User's current location */}
+        {/* User's current location - accuracy circle */}
         {userLocation && (
-          <>
-            <Circle
-              center={[userLocation.lat, userLocation.lng]}
-              radius={userLocation.accuracy}
-              pathOptions={{
-                color: "#3b82f6",
-                fillColor: "#3b82f6",
-                fillOpacity: 0.15,
-                weight: 2
-              }}
-            />
-            <Marker
-              position={[userLocation.lat, userLocation.lng]}
-              icon={userLocationIcon}
-            >
-              <Popup>
-                <div className="p-3 min-w-[200px]">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Navigation className="w-5 h-5 text-blue-500" />
-                    <h3 className="font-semibold text-base">Your Location</h3>
-                  </div>
-                  <div className="space-y-1 text-sm text-gray-600">
-                    <p>Lat: {userLocation.lat.toFixed(6)}</p>
-                    <p>Lng: {userLocation.lng.toFixed(6)}</p>
-                    <p>Accuracy: ±{Math.round(userLocation.accuracy)}m</p>
-                  </div>
+          <Circle
+            center={[userLocation.lat, userLocation.lng]}
+            radius={userLocation.accuracy}
+            pathOptions={{
+              color: "#3b82f6",
+              fillColor: "#3b82f6",
+              fillOpacity: 0.15,
+              weight: 2
+            }}
+          />
+        )}
+        
+        {/* User's current location - marker */}
+        {userLocation && (
+          <Marker
+            position={[userLocation.lat, userLocation.lng]}
+            icon={userLocationIcon}
+          >
+            <Popup>
+              <div className="p-3 min-w-[200px]">
+                <div className="flex items-center gap-2 mb-2">
+                  <Navigation className="w-5 h-5 text-blue-500" />
+                  <h3 className="font-semibold text-base">Your Location</h3>
                 </div>
-              </Popup>
-            </Marker>
-          </>
+                <div className="space-y-1 text-sm text-gray-600">
+                  <p>Lat: {userLocation.lat.toFixed(6)}</p>
+                  <p>Lng: {userLocation.lng.toFixed(6)}</p>
+                  <p>Accuracy: ±{Math.round(userLocation.accuracy)}m</p>
+                </div>
+              </div>
+            </Popup>
+          </Marker>
         )}
         
         {trafficData.intersections.map((intersection) => (

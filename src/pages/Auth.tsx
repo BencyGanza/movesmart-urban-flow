@@ -98,6 +98,9 @@ const Auth = () => {
     }
   };
 
+  const DEMO_EMAIL = "demo@movesmart.rw";
+  const DEMO_PASSWORD = "MoveSmart@2026";
+
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -204,6 +207,26 @@ const Auth = () => {
                     "Sign In"
                   )}
                 </Button>
+
+                <div className="rounded-lg border border-dashed bg-muted/50 p-3 text-sm space-y-2">
+                  <p className="font-medium">Demo account</p>
+                  <p className="text-muted-foreground">
+                    Email: <span className="font-mono">{DEMO_EMAIL}</span>
+                    <br />
+                    Password: <span className="font-mono">{DEMO_PASSWORD}</span>
+                  </p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => {
+                      setSignInEmail(DEMO_EMAIL);
+                      setSignInPassword(DEMO_PASSWORD);
+                    }}
+                  >
+                    Use demo account
+                  </Button>
+                </div>
               </form>
             </TabsContent>
 

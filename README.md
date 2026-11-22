@@ -112,12 +112,12 @@ import { RideService, DriverService, PaymentService } from '@/services';
 ### Book a Ride
 ```typescript
 const ride = await RideService.createRide({
-  pickup_location: "Nairobi CBD",
-  dropoff_location: "Westlands",
-  pickup_latitude: -1.2921,
-  pickup_longitude: 36.8219,
-  dropoff_latitude: -1.286389,
-  dropoff_longitude: 36.817223,
+  pickup_address: "Kigali City Centre",
+  dropoff_address: "Kimironko",
+  pickup_latitude: -1.9441,
+  pickup_longitude: 30.0619,
+  dropoff_latitude: -1.9496,
+  dropoff_longitude: 30.1260,
   estimated_fare: 500
 });
 ```
@@ -132,8 +132,8 @@ const match = await RideService.matchDriver({
 ### Get Nearby Drivers
 ```typescript
 const drivers = await DriverService.getNearbyDrivers({
-  latitude: -1.2921,
-  longitude: 36.8219,
+  latitude: -1.9441,
+  longitude: 30.0619,
   radius_km: 5
 });
 ```
@@ -142,7 +142,7 @@ const drivers = await DriverService.getNearbyDrivers({
 ```typescript
 const payment = await PaymentService.processPayment({
   payment_id: "payment-uuid",
-  phone_number: "+254712345678",
+  phone_number: "+250788123456",
   payment_method: "mobile_money"
 });
 ```

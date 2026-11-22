@@ -35,8 +35,8 @@ const TrafficControl = () => {
   const [intersections, setIntersections] = useState<TrafficIntersection[]>([
     {
       id: "int_001",
-      name: "Uhuru Highway & Haile Selassie Ave",
-      location: { lat: -1.2864, lng: 36.8172 },
+      name: "Kigali City Tower Roundabout (KN 4 Ave)",
+      location: { lat: -1.9441, lng: 30.0619 },
       vehicle_count: 156,
       congestion_level: "high",
       signal_status: "red",
@@ -46,8 +46,8 @@ const TrafficControl = () => {
     },
     {
       id: "int_002",
-      name: "Moi Avenue & Kenyatta Avenue",
-      location: { lat: -1.2841, lng: 36.8155 },
+      name: "Nyabugogo Junction (KN 1 Rd)",
+      location: { lat: -1.9395, lng: 30.0445 },
       vehicle_count: 89,
       congestion_level: "medium",
       signal_status: "green",
@@ -57,8 +57,8 @@ const TrafficControl = () => {
     },
     {
       id: "int_003",
-      name: "Ngong Road & Kilimani Road",
-      location: { lat: -1.2921, lng: 36.7820 },
+      name: "Nyamirambo (KN 2 Ave)",
+      location: { lat: -1.9780, lng: 30.0420 },
       vehicle_count: 42,
       congestion_level: "low",
       signal_status: "green",
@@ -68,8 +68,8 @@ const TrafficControl = () => {
     },
     {
       id: "int_004",
-      name: "Thika Road & Outer Ring",
-      location: { lat: -1.2195, lng: 36.8917 },
+      name: "Kimironko Junction (KG 11 Ave)",
+      location: { lat: -1.9496, lng: 30.1260 },
       vehicle_count: 203,
       congestion_level: "high",
       signal_status: "yellow",

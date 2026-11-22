@@ -1,13 +1,14 @@
 // Centralized type definitions for all backend operations
 
 export interface RideRequest {
-  pickup_location: string;
-  dropoff_location: string;
+  pickup_address: string;
+  dropoff_address: string;
   pickup_latitude: number;
   pickup_longitude: number;
   dropoff_latitude: number;
   dropoff_longitude: number;
   estimated_fare: number;
+  estimated_duration_minutes?: number;
 }
 
 export interface MatchDriverRequest {
@@ -22,7 +23,7 @@ export interface MatchDriverResponse {
 
 export interface UpdateRideStatusRequest {
   ride_id: string;
-  status: 'pending' | 'accepted' | 'in_progress' | 'completed' | 'cancelled';
+  status: 'pending' | 'active' | 'completed' | 'cancelled';
   actual_fare?: number;
 }
 

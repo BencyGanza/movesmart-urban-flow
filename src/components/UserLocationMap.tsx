@@ -73,7 +73,7 @@ const UserLocationMap = () => {
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: "mapbox://styles/mapbox/streets-v12",
-      center: userLocation ? [userLocation.lng, userLocation.lat] : [29.8739, -1.9403],
+      center: userLocation ? [userLocation.lng, userLocation.lat] : [30.0619, -1.9441],
       zoom: 15,
     });
 

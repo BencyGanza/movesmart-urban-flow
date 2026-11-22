@@ -20,8 +20,8 @@ const EmergencyVehicleTracker = () => {
     {
       id: "emg_001",
       type: "ambulance",
-      location: { lat: -1.2864, lng: 36.8172 },
-      destination: { lat: -1.2921, lng: 36.7820 },
+      location: { lat: -1.9441, lng: 30.0619 },
+      destination: { lat: -1.9780, lng: 30.0420 },
       status: "responding",
       priority: 1,
       eta: 8,
@@ -30,8 +30,8 @@ const EmergencyVehicleTracker = () => {
     {
       id: "emg_002",
       type: "police",
-      location: { lat: -1.2841, lng: 36.8155 },
-      destination: { lat: -1.2195, lng: 36.8917 },
+      location: { lat: -1.9395, lng: 30.0445 },
+      destination: { lat: -1.9496, lng: 30.1260 },
       status: "active",
       priority: 2,
       eta: 12,

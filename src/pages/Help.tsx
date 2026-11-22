@@ -119,7 +119,7 @@ const Help = () => {
     },
     {
       question: "How do I track my ride?",
-      answer: "Once your ride is accepted, you'll see real-time GPS tracking on the map."
+      answer: "Once a driver is matched to your ride, you'll see real-time GPS tracking on the map."
     },
     {
       question: "Is it safe to use MoveSmart?",

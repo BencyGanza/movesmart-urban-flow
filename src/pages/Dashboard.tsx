@@ -85,13 +85,13 @@ const Dashboard = () => {
 
       // Create ride using RideService
       const ride = await RideService.createRide({
-        pickup_location: pickupAddress,
-        dropoff_location: dropoffAddress,
-        pickup_latitude: -1.2921, // Mock coordinates - Nairobi
-        pickup_longitude: 36.8219,
-        dropoff_latitude: -1.286389,
-        dropoff_longitude: 36.817223,
-        estimated_fare: 500, // Mock fare in KES
+        pickup_address: pickupAddress,
+        dropoff_address: dropoffAddress,
+        pickup_latitude: -1.9441, // Default coordinates - Kigali City Centre
+        pickup_longitude: 30.0619,
+        dropoff_latitude: -1.9496, // Kimironko, Kigali
+        dropoff_longitude: 30.1260,
+        estimated_fare: 1000, // Fare in RWF
       });
 
       toast({
@@ -144,8 +144,7 @@ const Dashboard = () => {
   const getStatusBadge = (status: string) => {
     const variants: Record<string, any> = {
       pending: { variant: "outline", icon: Clock },
-      accepted: { variant: "secondary", icon: CheckCircle },
-      in_progress: { variant: "default", icon: Navigation },
+      active: { variant: "default", icon: Navigation },
       completed: { variant: "default", icon: CheckCircle },
       cancelled: { variant: "destructive", icon: XCircle },
     };
@@ -309,7 +308,7 @@ const Dashboard = () => {
                     <Brain className="h-4 w-4 text-primary" />
                     AI-Optimized Fare Estimate
                   </h3>
-                  <p className="text-2xl font-bold text-primary">KES 500 - 1,500</p>
+                  <p className="text-2xl font-bold text-primary">RWF 500 - 3,000</p>
                   <p className="text-sm text-muted-foreground mt-1">
                     Based on real-time traffic analysis • {trafficData.estimatedDelay}min delay expected
                   </p>
@@ -377,7 +376,7 @@ const Dashboard = () => {
                                 {new Date(ride.created_at).toLocaleDateString()}
                               </span>
                               <span className="font-semibold text-primary">
-                                KES {ride.actual_fare || ride.estimated_fare}
+                                RWF {Number(ride.actual_fare || ride.estimated_fare).toLocaleString()}
                               </span>
                             </div>
                             {ride.status === 'pending' && (

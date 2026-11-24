@@ -140,14 +140,15 @@ const About = () => {
 
         {/* Impact Section */}
         <section>
-          <h2 className="text-3xl font-bold text-center mb-8">Our Impact in Rwanda</h2>
+          <h2 className="text-3xl font-bold text-center mb-2">Our goals for Kigali</h2>
+          <p className="text-center text-muted-foreground mb-8">Targets we are aiming for once the smart traffic system is in place, not measured results.</p>
           <div className="grid md:grid-cols-3 gap-6">
             <Card className="border-none shadow-lg text-center">
               <CardHeader>
                 <CardTitle className="text-4xl text-primary">30%</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">Reduction in travel time through smart routing</p>
+                <p className="text-muted-foreground">Target: shorter travel times through smart routing</p>
               </CardContent>
             </Card>
             <Card className="border-none shadow-lg text-center">
@@ -155,7 +156,7 @@ const About = () => {
                 <CardTitle className="text-4xl text-primary">40%</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">Faster emergency vehicle response</p>
+                <p className="text-muted-foreground">Target: faster emergency vehicle response</p>
               </CardContent>
             </Card>
             <Card className="border-none shadow-lg text-center">
@@ -163,7 +164,7 @@ const About = () => {
                 <CardTitle className="text-4xl text-primary">35%</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">Reduction in CO2 emissions</p>
+                <p className="text-muted-foreground">Target: lower CO2 emissions from idling traffic</p>
               </CardContent>
             </Card>
           </div>

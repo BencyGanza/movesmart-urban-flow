@@ -13,6 +13,9 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['Lexend', 'system-ui', 'sans-serif'],
+      },
       animation: {
         'gradient': 'gradient 8s linear infinite',
       },

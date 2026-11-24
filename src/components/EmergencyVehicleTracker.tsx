@@ -69,7 +69,7 @@ const EmergencyVehicleTracker = () => {
           Emergency Vehicle Priority System
         </CardTitle>
         <CardDescription>
-          AI automatically clears traffic signals for emergency vehicles
+          Concept demo with simulated vehicles: how the system would clear traffic signals for ambulances and police in Kigali
         </CardDescription>
       </CardHeader>
       <CardContent>

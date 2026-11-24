@@ -90,16 +90,16 @@ export const Hero = () => {
           {/* Stats */}
           <div className="grid grid-cols-3 gap-8 pt-12 max-w-2xl mx-auto">
             <div className="space-y-2">
-              <div className="text-3xl md:text-4xl font-bold text-primary-foreground">1000+</div>
-              <div className="text-sm text-primary-foreground/80">Active Vehicles</div>
+              <div className="text-3xl md:text-4xl font-bold text-primary-foreground">3</div>
+              <div className="text-sm text-primary-foreground/80">Ways to ride: moto, taxi, bus</div>
             </div>
             <div className="space-y-2">
-              <div className="text-3xl md:text-4xl font-bold text-primary-foreground">50K+</div>
-              <div className="text-sm text-primary-foreground/80">Daily Rides</div>
+              <div className="text-3xl md:text-4xl font-bold text-primary-foreground">RWF</div>
+              <div className="text-sm text-primary-foreground/80">Fare shown before you book</div>
             </div>
             <div className="space-y-2">
-              <div className="text-3xl md:text-4xl font-bold text-primary-foreground">4.8★</div>
-              <div className="text-sm text-primary-foreground/80">User Rating</div>
+              <div className="text-3xl md:text-4xl font-bold text-primary-foreground">MoMo</div>
+              <div className="text-sm text-primary-foreground/80">MTN, Airtel or cash</div>
             </div>
           </div>
         </div>

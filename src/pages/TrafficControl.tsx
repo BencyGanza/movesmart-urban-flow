@@ -157,6 +157,10 @@ const TrafficControl = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8">
+        <div className="mb-6 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+          <strong>Concept demo:</strong> this page uses simulated data to show how the proposed AI traffic
+          system would work in Kigali. It is not connected to real cameras or traffic lights yet.
+        </div>
         {/* System Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <Card className="shadow-card">
@@ -217,9 +221,9 @@ const TrafficControl = () => {
           <CardHeader>
             <CardTitle className="text-2xl flex items-center gap-2">
               <Activity className="h-6 w-6 text-primary" />
-              Live Traffic Intersections
+              Traffic Intersections (simulated)
             </CardTitle>
-            <CardDescription>Real-time monitoring with computer vision AI (OpenCV + YOLO)</CardDescription>
+            <CardDescription>How monitoring with computer vision (OpenCV + YOLO) would look</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -233,7 +237,7 @@ const TrafficControl = () => {
                           {intersection.name}
                         </h3>
                         <p className="text-sm text-muted-foreground">
-                          {intersection.cameras_active} cameras active • YOLO detection enabled
+                          {intersection.cameras_active} cameras (simulated)
                         </p>
                       </div>
                       <div className="flex items-center gap-3">

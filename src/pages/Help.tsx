@@ -1,4 +1,5 @@
 import { Header } from "@/components/Header";
+import { PageHeader } from "@/components/PageHeader";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -25,6 +26,10 @@ const HELP_TOPICS: { keys: string[]; answer: string }[] = [
   { keys: ["account", "sign", "login", "log in", "password", "register", "demo"], answer: "Create an account on the Sign in page with your name, email and phone number. For a quick demo use demo@movesmart.rw with password MoveSmart@2026, or tap 'Use demo account'." },
   { keys: ["bus", "route", "nyabugogo", "kimironko", "remera", "kicukiro", "nyamirambo"], answer: "MoveSmart covers Kigali bus routes such as Nyabugogo to Kimironko, Remera to Downtown, Kicukiro to Nyamirambo, Nyabugogo to Kicukiro and Downtown to Kimihurura." },
   { keys: ["traffic", "ai", "camera", "signal", "ambulance"], answer: "The smart traffic system is our proposal for Kigali: cameras and signals connected to MoveSmart to ease congestion and give emergency vehicles a clear road. The Smart traffic page shows a simulated demo." },
+  { keys: ["plan", "planner", "journey", "route", "fastest", "safest", "when to leave", "best time"], answer: "Open the Journey planner, choose where you're starting and going and when you want to leave, then tap Plan journey. You'll see the fastest, safest and balanced routes, the best time to leave in the next three hours, and a preparation checklist. Tap Book this trip to book it." },
+  { keys: ["rain", "weather", "flood", "landslide", "what-if", "what if", "simulat"], answer: "The planner's Conditions tab shows rain, temperature and hazards for your trip. The What-If tab lets you test scenarios such as heavy rain, flooding, a blocked road or an accident. Weather and traffic in the planner are sample data in this version." },
+  { keys: ["community", "eyes", "pothole", "report a road", "road problem"], answer: "In the planner, open the Community tab, choose what you saw, pick the spot on the map and submit. Other riders can confirm it is still there or mark it cleared. You need to be signed in to post or vote." },
+  { keys: ["hospital", "ambulance", "912", "113", "fire", "111", "service"], answer: "The planner's Services tab lists hospitals, police, fuel and more near your destination. Emergency numbers in Rwanda: 112 emergency, 912 ambulance, 113 traffic accidents, 111 fire brigade." },
   { keys: ["location", "gps", "map"], answer: "Allow location access in your browser to see yourself on the map and to use your current location as the pickup point." },
 ];
 
@@ -84,6 +89,10 @@ const Help = () => {
 
   const faqItems = [
     {
+      question: "How do I plan a journey?",
+      answer: "Open the Journey planner, pick your start, destination and time. Compare the fastest, safest and balanced routes, then tap Book this trip.",
+    },
+    {
       question: "How do I book a ride?",
       answer: "Sign in, open My rides, choose your pickup and destination, pick moto, taxi or bus, then tap Book."
     },
@@ -109,22 +118,18 @@ const Help = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="container mx-auto px-4 pt-24 pb-16">
-        <section className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-hero bg-clip-text text-transparent">
-            How Can We Help?
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Ask the assistant or browse the most common questions
-          </p>
-        </section>
+      <PageHeader
+        title="Help and questions"
+        description="Ask the assistant or browse the most common questions. In an emergency, call 112."
+      />
+      <main className="container mx-auto px-4 py-12">
 
         <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
           {/* FAQ Section */}
           <section>
-            <Card className="border-none shadow-lg h-full">
+            <Card className="h-full">
               <CardHeader>
-                <CardTitle className="text-2xl">Frequently Asked Questions</CardTitle>
+                <CardTitle className="text-xl font-semibold">Common questions</CardTitle>
                 <CardDescription>Quick answers to common questions</CardDescription>
               </CardHeader>
               <CardContent>
@@ -142,9 +147,9 @@ const Help = () => {
 
           {/* Chatbot Section */}
           <section>
-            <Card className="border-none shadow-lg h-full flex flex-col">
+            <Card className="h-full flex flex-col">
               <CardHeader>
-                <CardTitle className="text-2xl flex items-center gap-2">
+                <CardTitle className="text-xl font-semibold flex items-center gap-2">
                   <Bot className="w-6 h-6 text-primary" />
                   MoveSmart assistant
                 </CardTitle>
@@ -161,7 +166,7 @@ const Help = () => {
                         }`}
                       >
                         {message.role === "assistant" && (
-                          <div className="w-8 h-8 rounded-full bg-gradient-hero flex items-center justify-center flex-shrink-0">
+                          <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
                             <Bot className="w-5 h-5 text-primary-foreground" />
                           </div>
                         )}
@@ -183,7 +188,7 @@ const Help = () => {
                     ))}
                     {isLoading && (
                       <div className="flex gap-3 justify-start">
-                        <div className="w-8 h-8 rounded-full bg-gradient-hero flex items-center justify-center flex-shrink-0">
+                        <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
                           <Bot className="w-5 h-5 text-primary-foreground" />
                         </div>
                         <div className="rounded-lg px-4 py-2 bg-muted">

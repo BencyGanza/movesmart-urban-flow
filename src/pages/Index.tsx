@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import {
   BarChart3,
+  CheckCircle2,
   Bike,
   CreditCard,
   History,
@@ -51,6 +52,20 @@ const safety = [
   { Icon: ShieldAlert, title: "Report a problem", body: "Flag unsafe driving, harassment or overcharging from the trip." },
   { Icon: Star, title: "Rate every ride", body: "Ratings keep drivers accountable." },
   { Icon: Phone, title: "Emergency: 112", body: "The Rwanda National Police number is shown in the app." },
+];
+
+const plannerPoints = [
+  "Three routes side by side, each explaining why it was recommended",
+  "Best time to leave in the next three hours, and a preparation checklist",
+  "What-If simulator: heavy rain, a blocked road, flooding or an accident",
+  "Community Eyes: report and confirm road problems with other riders",
+  "Nearby hospitals, police and emergency numbers 112, 912, 113 and 111",
+];
+
+const plannerRoutes = [
+  { name: "Fastest", color: "#2563eb", note: "Via Airport Road, passes one road works notice", time: "31 min" },
+  { name: "Safest estimated", color: "#0e9f8e", note: "Avoids the flood-prone Nyabugogo valley", time: "36 min" },
+  { name: "Balanced", color: "#c2417a", note: "Best mix of time and exposure", time: "33 min" },
 ];
 
 const Index = () => {
@@ -188,6 +203,45 @@ const Index = () => {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Journey planner */}
+      <section id="planner" className="scroll-mt-20">
+        <div className="container mx-auto px-4 py-20 md:py-24 grid lg:grid-cols-2 gap-12 items-center">
+          <div className="max-w-xl">
+            <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">See the journey before you take it</h2>
+            <p className="mt-4 text-muted-foreground leading-relaxed">
+              The journey planner compares the fastest, safest and best-balanced routes across Kigali, with traffic, rain,
+              flood-prone roads and road works along the way. It tells you the best time to leave and what to prepare.
+            </p>
+            <ul className="mt-6 space-y-3">
+              {plannerPoints.map((pt) => (
+                <li key={pt} className="flex gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-secondary shrink-0 mt-0.5" />
+                  <span className="text-sm leading-relaxed">{pt}</span>
+                </li>
+              ))}
+            </ul>
+            <Button className="mt-8" size="lg" onClick={() => navigate("/planner")}>
+              Open the journey planner
+            </Button>
+          </div>
+          <div className="rounded-2xl border bg-card p-6 shadow-[0_24px_60px_-30px_hsl(210_61%_16%/0.35)]">
+            <p className="text-sm text-muted-foreground">Nyabugogo bus park to Kigali International Airport</p>
+            <div className="mt-4 space-y-3">
+              {plannerRoutes.map((r) => (
+                <div key={r.name} className="flex items-center gap-4 rounded-xl border p-4" style={{ borderLeft: `5px solid ${r.color}` }}>
+                  <div className="flex-1">
+                    <p className="font-semibold" style={{ color: r.color }}>{r.name}</p>
+                    <p className="text-sm text-muted-foreground">{r.note}</p>
+                  </div>
+                  <p className="text-xl font-semibold tabular-nums">{r.time}</p>
+                </div>
+              ))}
+            </div>
+            <p className="mt-4 text-xs text-muted-foreground">Example with sample traffic and weather data.</p>
           </div>
         </div>
       </section>

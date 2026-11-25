@@ -4,6 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
+import { PageHeader } from "@/components/PageHeader";
+import { Footer } from "@/components/Footer";
 import { 
   Camera, 
   Activity, 
@@ -122,14 +124,14 @@ const TrafficControl = () => {
   const handleOptimizeAll = () => {
     setIntersections(prev => prev.map(int => ({ ...int, ai_optimized: true })));
     toast({
-      title: "AI Optimization Activated",
+      title: "Signal optimisation on (simulation)",
       description: "All intersections now using adaptive signal control",
     });
   };
 
   const handleEmergencyOverride = (intersectionId: string) => {
     toast({
-      title: "Emergency Override Activated",
+      title: "Emergency priority on (simulation)",
       description: "Priority lane cleared for emergency vehicle",
     });
   };
@@ -137,25 +139,16 @@ const TrafficControl = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      {/* Traffic Control Header */}
-      <header className="border-b bg-card shadow-card sticky top-16 z-40">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-primary flex items-center gap-2">
-                <Brain className="h-8 w-8" />
-                AI Traffic Control Center
-              </h1>
-              <p className="text-sm text-muted-foreground">MoveSmart Intelligent Traffic Management System</p>
-            </div>
-            <Button onClick={handleOptimizeAll} className="gap-2">
-              <Zap className="h-4 w-4" />
-              Optimize All
-            </Button>
-          </div>
-        </div>
-      </header>
-
+      <PageHeader
+        title="Traffic control centre"
+        description="The operator view of the proposed AI traffic system: intersections, signals and emergency priority across Kigali. Concept demo with simulated data."
+        actions={
+          <Button onClick={handleOptimizeAll} className="gap-2 bg-accent text-accent-foreground hover:bg-accent/90">
+            <Zap className="h-4 w-4" />
+            Optimise all signals
+          </Button>
+        }
+      />
       <main className="container mx-auto px-4 py-8">
         <div className="mb-6 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
           <strong>Concept demo:</strong> this page uses simulated data to show how the proposed AI traffic
@@ -376,6 +369,7 @@ const TrafficControl = () => {
           </CardContent>
         </Card>
       </main>
+      <Footer />
     </div>
   );
 };

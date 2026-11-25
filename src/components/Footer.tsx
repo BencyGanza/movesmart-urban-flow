@@ -7,6 +7,7 @@ const columns = [
     title: "Ride",
     links: [
       { to: "/dashboard", label: "Book a ride" },
+      { to: "/planner", label: "Journey planner" },
       { to: "/#how-it-works", label: "How it works" },
       { to: "/#features", label: "Features" },
       { to: "/#safety", label: "Safety" },

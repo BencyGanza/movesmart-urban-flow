@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -69,8 +69,24 @@ const Dashboard = () => {
   const [profile, setProfile] = useState<any>(null);
   const [stats, setStats] = useState<{ vehicles: number; routes: number; byType: Record<string, number> } | null>(null);
 
-  const [pickup, setPickup] = useState<Place | null>(null);
-  const [dropoff, setDropoff] = useState<Place | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const placeFromParams = (key: string): Place | null => {
+    const name = searchParams.get(key);
+    const lat = Number(searchParams.get(`${key}Lat`));
+    const lng = Number(searchParams.get(`${key}Lng`));
+    return name && Number.isFinite(lat) && Number.isFinite(lng) && lat && lng ? { name, lat, lng } : null;
+  };
+  const [pickup, setPickup] = useState<Place | null>(() => placeFromParams("from"));
+  const [dropoff, setDropoff] = useState<Place | null>(() => placeFromParams("to"));
+
+  // A trip handed over from the journey planner arrives in the address bar; keep the URL clean afterwards.
+  useEffect(() => {
+    if (searchParams.get("from") || searchParams.get("to")) {
+      if (pickup && dropoff) toast({ title: "Trip loaded from the planner", description: `${pickup.name} to ${dropoff.name}. Choose a vehicle and book.` });
+      setSearchParams({}, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [vehicleType, setVehicleType] = useState<VehicleType>("motorbike");
   const [booking, setBooking] = useState(false);
   const [busyRide, setBusyRide] = useState<string | null>(null);

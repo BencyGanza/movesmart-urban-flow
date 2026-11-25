@@ -35,7 +35,8 @@ The `.env` file points to the existing MoveSmart Supabase database, so the app w
 To use your own Supabase project instead:
 
 1. Create a project at https://supabase.com.
-2. In the SQL editor, run the files in `supabase/migrations/` in date order, then `supabase/seed.sql`.
+2. In the SQL editor, run the files in `supabase/migrations/` in date order, then `supabase/seed.sql`
+   (this adds the Kigali routes, vehicles and sample Community Eyes reports).
 3. Create the demo user (see the note at the end of `supabase/seed.sql`).
 4. Copy `.env.example` to `.env` and fill in your project's URL and anon key.
 5. Optional, for the map: add a Mapbox public token as the `MAPBOX_PUBLIC_TOKEN` secret and deploy the
@@ -45,6 +46,11 @@ To use your own Supabase project instead:
 ## Features
 
 - **Homepage** with a live fare check: pick a destination and compare moto, taxi and bus prices.
+- **Journey planner** (`/planner`, no account needed): fastest, safest and balanced routes with traffic, rain
+  and hazards; trip briefing with the best time to leave and a preparation checklist; animated journey preview;
+  2D map with layers and an illustrative 3D view; conditions; essential services and emergency numbers;
+  What-If simulator; **Community Eyes** road reports shared through the database; "Book this trip" hands the
+  route to booking. Traffic, weather and hazards are sample data on a schematic map.
 - **Sign up / sign in**, including a one-click demo account.
 - **Book a ride**: Kigali place search (built-in places plus Mapbox limited to Rwanda), "use my location",
   distance, time and RWF fare per vehicle type, nearest-vehicle matching.
@@ -60,7 +66,8 @@ To use your own Supabase project instead:
 
 ```
 src/
-  pages/          Index (home), Auth, Dashboard, Help, About, SmartTraffic, TrafficControl
+  pages/          Index (home), Auth, Dashboard, Planner, Help, About, SmartTraffic, TrafficControl
+  features/planner/  Journey planner engine, styles and Community Eyes API
   components/     Header, Footer, PlaceSearch, RideDialogs, maps, home/FareTicket, ui/ (shadcn)
   services/       rideService (booking, payments, ratings, sharing, reports)
   lib/kigali.ts   Kigali places, distance and fare rules

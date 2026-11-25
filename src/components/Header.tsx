@@ -9,6 +9,7 @@ import movesmartLogo from "@/assets/movesmart-logo.png";
 
 const publicLinks = [
   { to: "/", label: "Home" },
+  { to: "/planner", label: "Journey planner" },
   { to: "/smart-traffic", label: "Smart traffic" },
   { to: "/about", label: "About" },
   { to: "/help", label: "Help" },

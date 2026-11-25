@@ -24,6 +24,16 @@ values
   ('RB 301 X', 'Honda CB125 (moto)', 'motorbike', 1, -1.9430, 30.0590, true, now())
 on conflict (license_plate) do nothing;
 
+-- Sample Community Eyes reports
+insert into public.community_reports (user_id, report_type, description, map_x, map_y, severity, confirms, cleared, created_at)
+select null, v.t, v.d, v.x, v.y, v.s, v.c, 0, now() - v.ago
+from (values
+  ('Flooding', 'Water across one lane after the last storm, passable slowly.', 300, 262, 2, 2, interval '40 minutes'),
+  ('Road damage', 'Deep pothole cluster in the right lane.', 626, 572, 1, 4, interval '3 hours'),
+  ('Blocked road', 'Truck broken down at the junction, traffic squeezing past.', 712, 262, 2, 0, interval '15 minutes')
+) as v(t, d, x, y, s, c, ago)
+where not exists (select 1 from public.community_reports);
+
 -- Demo login: create it in the Supabase dashboard under
 -- Authentication > Users > Add user, with email demo@movesmart.rw and
 -- password MoveSmart@2026, and tick "Auto confirm user".

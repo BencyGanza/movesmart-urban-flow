@@ -4,6 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
+import { PageHeader } from "@/components/PageHeader";
+import { Footer } from "@/components/Footer";
 import { 
   Camera, 
   Activity, 
@@ -35,8 +37,8 @@ const TrafficControl = () => {
   const [intersections, setIntersections] = useState<TrafficIntersection[]>([
     {
       id: "int_001",
-      name: "Uhuru Highway & Haile Selassie Ave",
-      location: { lat: -1.2864, lng: 36.8172 },
+      name: "Kigali City Tower Roundabout (KN 4 Ave)",
+      location: { lat: -1.9441, lng: 30.0619 },
       vehicle_count: 156,
       congestion_level: "high",
       signal_status: "red",
@@ -46,8 +48,8 @@ const TrafficControl = () => {
     },
     {
       id: "int_002",
-      name: "Moi Avenue & Kenyatta Avenue",
-      location: { lat: -1.2841, lng: 36.8155 },
+      name: "Nyabugogo Junction (KN 1 Rd)",
+      location: { lat: -1.9395, lng: 30.0445 },
       vehicle_count: 89,
       congestion_level: "medium",
       signal_status: "green",
@@ -57,8 +59,8 @@ const TrafficControl = () => {
     },
     {
       id: "int_003",
-      name: "Ngong Road & Kilimani Road",
-      location: { lat: -1.2921, lng: 36.7820 },
+      name: "Nyamirambo (KN 2 Ave)",
+      location: { lat: -1.9780, lng: 30.0420 },
       vehicle_count: 42,
       congestion_level: "low",
       signal_status: "green",
@@ -68,8 +70,8 @@ const TrafficControl = () => {
     },
     {
       id: "int_004",
-      name: "Thika Road & Outer Ring",
-      location: { lat: -1.2195, lng: 36.8917 },
+      name: "Kimironko Junction (KG 11 Ave)",
+      location: { lat: -1.9496, lng: 30.1260 },
       vehicle_count: 203,
       congestion_level: "high",
       signal_status: "yellow",
@@ -122,14 +124,14 @@ const TrafficControl = () => {
   const handleOptimizeAll = () => {
     setIntersections(prev => prev.map(int => ({ ...int, ai_optimized: true })));
     toast({
-      title: "AI Optimization Activated",
+      title: "Signal optimisation on (simulation)",
       description: "All intersections now using adaptive signal control",
     });
   };
 
   const handleEmergencyOverride = (intersectionId: string) => {
     toast({
-      title: "Emergency Override Activated",
+      title: "Emergency priority on (simulation)",
       description: "Priority lane cleared for emergency vehicle",
     });
   };
@@ -137,26 +139,21 @@ const TrafficControl = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      {/* Traffic Control Header */}
-      <header className="border-b bg-card shadow-card sticky top-16 z-40">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-primary flex items-center gap-2">
-                <Brain className="h-8 w-8" />
-                AI Traffic Control Center
-              </h1>
-              <p className="text-sm text-muted-foreground">MoveSmart Intelligent Traffic Management System</p>
-            </div>
-            <Button onClick={handleOptimizeAll} className="gap-2">
-              <Zap className="h-4 w-4" />
-              Optimize All
-            </Button>
-          </div>
-        </div>
-      </header>
-
+      <PageHeader
+        title="Traffic control centre"
+        description="The operator view of the proposed AI traffic system: intersections, signals and emergency priority across Kigali. Concept demo with simulated data."
+        actions={
+          <Button onClick={handleOptimizeAll} className="gap-2 bg-accent text-accent-foreground hover:bg-accent/90">
+            <Zap className="h-4 w-4" />
+            Optimise all signals
+          </Button>
+        }
+      />
       <main className="container mx-auto px-4 py-8">
+        <div className="mb-6 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+          <strong>Concept demo:</strong> this page uses simulated data to show how the proposed AI traffic
+          system would work in Kigali. It is not connected to real cameras or traffic lights yet.
+        </div>
         {/* System Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <Card className="shadow-card">
@@ -217,9 +214,9 @@ const TrafficControl = () => {
           <CardHeader>
             <CardTitle className="text-2xl flex items-center gap-2">
               <Activity className="h-6 w-6 text-primary" />
-              Live Traffic Intersections
+              Traffic Intersections (simulated)
             </CardTitle>
-            <CardDescription>Real-time monitoring with computer vision AI (OpenCV + YOLO)</CardDescription>
+            <CardDescription>How monitoring with computer vision (OpenCV + YOLO) would look</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -233,7 +230,7 @@ const TrafficControl = () => {
                           {intersection.name}
                         </h3>
                         <p className="text-sm text-muted-foreground">
-                          {intersection.cameras_active} cameras active • YOLO detection enabled
+                          {intersection.cameras_active} cameras (simulated)
                         </p>
                       </div>
                       <div className="flex items-center gap-3">
@@ -372,6 +369,7 @@ const TrafficControl = () => {
           </CardContent>
         </Card>
       </main>
+      <Footer />
     </div>
   );
 };

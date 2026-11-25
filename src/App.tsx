@@ -9,6 +9,8 @@ import Dashboard from "./pages/Dashboard";
 import TrafficControl from "./pages/TrafficControl";
 import About from "./pages/About";
 import Help from "./pages/Help";
+import SmartTraffic from "./pages/SmartTraffic";
+import Planner from "./pages/Planner";
 import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
@@ -19,12 +21,14 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
+      <BrowserRouter basename={import.meta.env.BASE_URL}>
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/about" element={<About />} />
           <Route path="/help" element={<Help />} />
+          <Route path="/smart-traffic" element={<SmartTraffic />} />
+          <Route path="/planner" element={<Planner />} />
           <Route 
             path="/dashboard" 
             element={

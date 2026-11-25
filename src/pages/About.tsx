@@ -1,171 +1,103 @@
+import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { MapPin, Users, Shield, CreditCard, Zap, TrendingUp } from "lucide-react";
+import { PageHeader } from "@/components/PageHeader";
+import { Button } from "@/components/ui/button";
+import { Bike, CreditCard, Map, Route, ShieldCheck, TrafficCone } from "lucide-react";
+
+const features = [
+  { Icon: Bike, title: "Moto, taxi and bus in one app", body: "Book the nearest available vehicle, with the fare in RWF shown before you confirm." },
+  { Icon: Route, title: "Journey planner", body: "Compare the fastest, safest and best-balanced routes, with traffic, rain and road hazards along the way." },
+  { Icon: CreditCard, title: "Pay the local way", body: "MTN MoMo, Airtel Money or cash. Mobile money is simulated in this demo version." },
+  { Icon: ShieldCheck, title: "Safety built in", body: "Share your trip on WhatsApp, report problems, rate drivers and reach 112 quickly." },
+  { Icon: Map, title: "Community Eyes", body: "Riders report flooding, accidents and road damage, and others confirm or clear them." },
+  { Icon: TrafficCone, title: "Smart traffic proposal", body: "A concept for adaptive traffic signals and emergency-vehicle priority in Kigali." },
+];
+
+const guide = [
+  { page: "Home", what: "An overview of MoveSmart and a quick fare check." },
+  { page: "Journey planner", what: "Plan a trip, compare routes, check conditions and try What-If scenarios. No account needed." },
+  { page: "My rides", what: "Book a ride, follow your current trip, pay, rate and see your history. Needs an account." },
+  { page: "Smart traffic", what: "Our proposal for AI-assisted traffic management, shown with simulated data." },
+  { page: "Traffic control", what: "The operator control centre concept for transport companies." },
+  { page: "Help", what: "Common questions and a built-in assistant." },
+];
+
+const goals = [
+  { value: "30%", label: "shorter travel times through smart routing" },
+  { value: "40%", label: "faster emergency vehicle response" },
+  { value: "35%", label: "lower CO₂ emissions from idling traffic" },
+];
 
 const About = () => {
-  const features = [
-    {
-      icon: MapPin,
-      title: "Real-Time GPS Tracking",
-      description: "Track your ride in real-time with accurate GPS positioning and live driver location updates."
-    },
-    {
-      icon: Users,
-      title: "Smart Matching",
-      description: "Our AI algorithm instantly matches you with the nearest available driver for quick pickups."
-    },
-    {
-      icon: Shield,
-      title: "Safety First",
-      description: "Enhanced safety features including driver verification, emergency alerts, and trip sharing."
-    },
-    {
-      icon: CreditCard,
-      title: "Flexible Payments",
-      description: "Multiple payment options including mobile money (MTN MoMo, Airtel Money) and cash."
-    },
-    {
-      icon: Zap,
-      title: "AI Traffic Management",
-      description: "Intelligent traffic control system that optimizes routes and reduces congestion."
-    },
-    {
-      icon: TrendingUp,
-      title: "Route Optimization",
-      description: "Smart routing algorithms that find the fastest path to your destination."
-    }
-  ];
-
-  const navigationGuide = [
-    {
-      section: "Home",
-      description: "Learn about MoveSmart's features, see how it works, and explore our AI traffic management system."
-    },
-    {
-      section: "Sign In / Sign Up",
-      description: "Create an account or sign in to start booking rides and accessing all features."
-    },
-    {
-      section: "Dashboard",
-      description: "Book rides, track your trips, view ride history, and manage your profile."
-    },
-    {
-      section: "Traffic Control",
-      description: "View real-time traffic conditions, emergency vehicle tracking, and smart routing."
-    },
-    {
-      section: "Help",
-      description: "Get assistance from our AI-powered chatbot for any questions or issues."
-    }
-  ];
-
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
-      <main className="container mx-auto px-4 pt-24 pb-16">
-        {/* Hero Section */}
-        <section className="text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-hero bg-clip-text text-transparent">
-            About MoveSmart
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Revolutionizing public transportation in Rwanda with smart technology, 
-            AI-powered traffic management, and seamless ride-hailing services.
-          </p>
-        </section>
+      <PageHeader
+        title="About MoveSmart"
+        description="MoveSmart makes getting around Kigali simpler and safer: fair prices you can see, the nearest driver, and the information you need before you set off."
+      />
 
-        {/* Mission Section */}
-        <section className="mb-16">
-          <Card className="border-none shadow-lg">
-            <CardHeader>
-              <CardTitle className="text-2xl">Our Mission</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4 text-muted-foreground">
+      <main>
+        <section className="container mx-auto px-4 py-16 grid lg:grid-cols-[0.9fr_1.1fr] gap-12">
+          <div>
+            <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">Our mission</h2>
+            <div className="mt-4 space-y-4 text-muted-foreground leading-relaxed max-w-xl">
               <p>
-                MoveSmart is committed to transforming public transportation in Rwanda by providing 
-                a reliable, safe, and efficient ride-hailing platform that connects passengers with 
-                drivers while reducing traffic congestion through intelligent AI systems.
+                Every day thousands of people in Kigali negotiate moto fares, wait for buses without knowing when they
+                will come, and get caught by rain on flood-prone roads. MoveSmart brings booking, fares, route planning
+                and safety tools together in one place.
               </p>
               <p>
-                We align with Rwanda's Vision 2050 goals by supporting smart city technology, 
-                promoting cashless transactions, and contributing to sustainable urban mobility solutions.
+                We support Rwanda's Vision 2050 goals for smart cities, cashless payments and sustainable urban
+                mobility.
               </p>
-            </CardContent>
-          </Card>
-        </section>
-
-        {/* Features Grid */}
-        <section className="mb-16">
-          <h2 className="text-3xl font-bold text-center mb-8">Key Features</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((feature, index) => (
-              <Card key={index} className="border-none shadow-lg hover:shadow-xl transition-shadow">
-                <CardHeader>
-                  <div className="w-12 h-12 bg-gradient-hero rounded-lg flex items-center justify-center mb-4">
-                    <feature.icon className="w-6 h-6 text-primary-foreground" />
-                  </div>
-                  <CardTitle className="text-xl">{feature.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">{feature.description}</p>
-                </CardContent>
-              </Card>
+            </div>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-x-8 gap-y-8">
+            {features.map(({ Icon, title, body }) => (
+              <div key={title} className="flex gap-4">
+                <Icon className="h-6 w-6 shrink-0 text-primary mt-0.5" />
+                <div>
+                  <h3 className="font-semibold">{title}</h3>
+                  <p className="mt-1 text-sm text-muted-foreground leading-relaxed">{body}</p>
+                </div>
+              </div>
             ))}
           </div>
         </section>
 
-        {/* Navigation Guide */}
-        <section className="mb-16">
-          <h2 className="text-3xl font-bold text-center mb-8">Navigation Guide</h2>
-          <Card className="border-none shadow-lg">
-            <CardHeader>
-              <CardDescription>
-                Here's how to navigate through the MoveSmart app
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {navigationGuide.map((item, index) => (
-                  <div key={index} className="border-l-4 border-primary pl-4 py-2">
-                    <h3 className="font-semibold text-lg mb-1">{item.section}</h3>
-                    <p className="text-muted-foreground">{item.description}</p>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+        <section className="bg-muted">
+          <div className="container mx-auto px-4 py-16">
+            <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">Finding your way around the app</h2>
+            <dl className="mt-8 grid md:grid-cols-2 gap-x-12 gap-y-6">
+              {guide.map((g) => (
+                <div key={g.page} className="border-l-4 border-primary pl-4">
+                  <dt className="font-semibold">{g.page}</dt>
+                  <dd className="mt-1 text-sm text-muted-foreground">{g.what}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
         </section>
 
-        {/* Impact Section */}
-        <section>
-          <h2 className="text-3xl font-bold text-center mb-8">Our Impact in Rwanda</h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            <Card className="border-none shadow-lg text-center">
-              <CardHeader>
-                <CardTitle className="text-4xl text-primary">30%</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">Reduction in travel time through smart routing</p>
-              </CardContent>
-            </Card>
-            <Card className="border-none shadow-lg text-center">
-              <CardHeader>
-                <CardTitle className="text-4xl text-primary">40%</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">Faster emergency vehicle response</p>
-              </CardContent>
-            </Card>
-            <Card className="border-none shadow-lg text-center">
-              <CardHeader>
-                <CardTitle className="text-4xl text-primary">35%</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">Reduction in CO2 emissions</p>
-              </CardContent>
-            </Card>
+        <section className="container mx-auto px-4 py-16">
+          <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">Our goals for Kigali</h2>
+          <p className="mt-2 text-muted-foreground">
+            Targets for when the smart traffic system is in place. They are goals, not measured results.
+          </p>
+          <div className="mt-8 grid sm:grid-cols-3 gap-px bg-border rounded-xl overflow-hidden border">
+            {goals.map((g) => (
+              <div key={g.label} className="bg-card p-6">
+                <p className="text-4xl font-semibold text-primary">{g.value}</p>
+                <p className="mt-2 text-sm text-muted-foreground">Target: {g.label}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-12 flex flex-wrap gap-3">
+            <Button size="lg" onClick={() => navigate("/dashboard")}>Book a ride</Button>
+            <Button size="lg" variant="outline" onClick={() => navigate("/planner")}>Plan a journey</Button>
           </div>
         </section>
       </main>

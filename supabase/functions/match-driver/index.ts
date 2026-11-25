@@ -68,7 +68,7 @@ serve(async (req) => {
       .from('rides')
       .update({
         vehicle_id: selectedVehicle.id,
-        status: 'accepted',
+        status: 'active',
         started_at: new Date().toISOString(),
       })
       .eq('id', ride_id);

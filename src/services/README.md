@@ -44,7 +44,7 @@ const matchResult = await RideService.matchDriver({
 // Update ride status
 const statusUpdate = await RideService.updateRideStatus({
   ride_id: ride.id,
-  status: 'in_progress'
+  status: 'active'
 });
 
 // Get user's rides

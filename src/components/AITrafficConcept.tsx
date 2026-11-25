@@ -9,12 +9,12 @@ const AITrafficConcept = () => {
       <div className="text-center space-y-4">
         <Badge variant="outline" className="gap-2 px-4 py-2">
           <Brain className="h-4 w-4" />
-          AI-Powered Smart City Infrastructure
+          Proposed system · concept
         </Badge>
         <h2 className="text-4xl font-bold">Intelligent Traffic Management System</h2>
         <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-          Real-time CCTV and sensor network connected to MoveSmart app for adaptive traffic control,
-          congestion reduction, and emergency vehicle prioritization across the city
+          Our proposal for Kigali: a CCTV and sensor network connected to the MoveSmart app for adaptive
+          traffic control, less congestion and priority for emergency vehicles. Not yet deployed.
         </p>
       </div>
 

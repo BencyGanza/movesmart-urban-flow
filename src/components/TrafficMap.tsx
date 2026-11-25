@@ -41,25 +41,25 @@ const TrafficMap = () => {
 
   const [trafficData] = useState<TrafficData>({
     intersections: [
-      { id: "int_001", name: "Uhuru Highway", position: [-1.2864, 36.8172], congestion: "high", vehicles: 156 },
-      { id: "int_002", name: "Moi Avenue", position: [-1.2841, 36.8155], congestion: "medium", vehicles: 89 },
-      { id: "int_003", name: "Ngong Road", position: [-1.2921, 36.7820], congestion: "low", vehicles: 42 },
-      { id: "int_004", name: "Thika Road", position: [-1.2195, 36.8917], congestion: "high", vehicles: 203 }
+      { id: "int_001", name: "Kigali City Tower", position: [-1.9441, 30.0619], congestion: "high", vehicles: 156 },
+      { id: "int_002", name: "Nyabugogo", position: [-1.9395, 30.0445], congestion: "medium", vehicles: 89 },
+      { id: "int_003", name: "Nyamirambo", position: [-1.9780, 30.0420], congestion: "low", vehicles: 42 },
+      { id: "int_004", name: "Kimironko", position: [-1.9496, 30.1260], congestion: "high", vehicles: 203 }
     ],
     routes: [
       {
         id: "route_001",
-        coordinates: [[-1.2864, 36.8172], [-1.2841, 36.8155], [-1.2921, 36.7820]],
+        coordinates: [[-1.9441, 30.0619], [-1.9395, 30.0445], [-1.9780, 30.0420]],
         congestion: "medium"
       },
       {
         id: "route_002",
-        coordinates: [[-1.2841, 36.8155], [-1.2195, 36.8917]],
+        coordinates: [[-1.9395, 30.0445], [-1.9496, 30.1260]],
         congestion: "high"
       }
     ],
     incidents: [
-      { id: "inc_001", position: [-1.2800, 36.8200], type: "Accident", description: "Minor collision" }
+      { id: "inc_001", position: [-1.9585, 30.1120], type: "Accident", description: "Minor collision" }
     ]
   });
 
@@ -121,7 +121,7 @@ const TrafficMap = () => {
 
     const center: [number, number] = userLocation 
       ? [userLocation.lng, userLocation.lat] 
-      : [36.8219, -1.2864];
+      : [30.0619, -1.9441];
 
     map.current = new mapboxgl.Map({
       container: mapContainer.current,

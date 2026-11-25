@@ -39,7 +39,7 @@ serve(async (req) => {
 
     if (paymentError) throw paymentError;
 
-    // In production, integrate with mobile money API (M-Pesa, Airtel Money, etc.)
+    // In production, integrate with mobile money API (MTN MoMo, Airtel Money, etc.)
     // For now, simulate payment processing
     const transaction_id = `TXN${Date.now()}${Math.floor(Math.random() * 1000)}`;
 
@@ -48,7 +48,7 @@ serve(async (req) => {
       .from('payments')
       .update({
         payment_status: 'completed',
-        payment_method: payment_method || 'mobile_money',
+        payment_method: payment_method || 'cash',
         phone_number: phone_number,
         transaction_id: transaction_id,
         completed_at: new Date().toISOString(),

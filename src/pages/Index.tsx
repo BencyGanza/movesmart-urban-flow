@@ -26,7 +26,7 @@ const HERO_BG = "hsl(197 100% 24%)";
 const steps = [
   {
     title: "Say where you're going",
-    body: "Search any place in Kigali or use your current location as the pickup point.",
+    body: "Search any place in Rwanda, from a Kigali street to a town upcountry, or use your current location.",
   },
   {
     title: "Pick moto, taxi or bus",
@@ -39,12 +39,12 @@ const steps = [
 ];
 
 const features = [
-  { Icon: LocateFixed, title: "Kigali place search", body: "Bus parks, markets, neighbourhoods and landmarks, or your GPS location." },
+  { Icon: LocateFixed, title: "Places across Rwanda", body: "Kigali landmarks, bus parks and towns in every province, or your GPS location." },
   { Icon: CreditCard, title: "Fare shown up front", body: "Prices in Rwandan francs for each vehicle type, so there's no haggling." },
   { Icon: Bike, title: "Nearest driver", body: "Your request goes to the closest available moto, taxi or bus." },
   { Icon: History, title: "Trip history", body: "Every ride, payment and rating in one place." },
-  { Icon: Route, title: "City bus routes", body: "Nyabugogo, Kimironko, Remera, Kicukiro and more, with fares." },
-  { Icon: MapPinned, title: "Live location map", body: "See where you are on the map while you plan your trip." },
+  { Icon: Route, title: "City and intercity buses", body: "Kigali city routes plus buses to Musanze, Huye, Rubavu, Rwamagana, Nyagatare and Rusizi." },
+  { Icon: MapPinned, title: "3D map of Rwanda", body: "Explore the hills, lakes and towns in 3D, with vehicles and bus routes on the map." },
 ];
 
 const safety = [
@@ -83,7 +83,7 @@ const Index = () => {
         <div className="container mx-auto px-4 pt-14 pb-40 md:pt-20 md:pb-48 grid lg:grid-cols-[1.1fr_0.9fr] gap-12 items-center relative z-10">
           <div className="max-w-xl">
             <h1 className="text-4xl sm:text-5xl lg:text-[3.6rem] font-semibold leading-[1.05] tracking-tight text-balance">
-              Moto, taxi or bus across Kigali, priced before you go.
+              Moto, taxi or bus across Rwanda, priced before you go.
             </h1>
             <p className="mt-6 text-lg text-white/85 leading-relaxed">
               MoveSmart finds the nearest driver, shows the fare in Rwandan francs and lets you pay with MTN MoMo,
@@ -185,13 +185,14 @@ const Index = () => {
       <section id="features" className="bg-muted scroll-mt-20">
         <div className="container mx-auto px-4 py-20 md:py-24 grid lg:grid-cols-[0.8fr_1.2fr] gap-12">
           <div className="max-w-md">
-            <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">Built for getting around Kigali</h2>
+            <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">Built for getting around Rwanda</h2>
             <p className="mt-4 text-muted-foreground leading-relaxed">
-              Everything you need for a daily commute or a one-off trip, from the bus park to the airport.
+              Everything you need for a daily commute in Kigali or a trip upcountry, from the bus park to the lake.
             </p>
-            <Button className="mt-8" onClick={() => navigate("/dashboard")}>
-              Open my rides
-            </Button>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Button onClick={() => navigate("/dashboard")}>Open my rides</Button>
+              <Button variant="outline" onClick={() => navigate("/map")}>Explore the 3D map</Button>
+            </div>
           </div>
           <div className="grid sm:grid-cols-2 gap-x-10 gap-y-8">
             {features.map(({ Icon, title, body }) => (

@@ -1,32 +1,42 @@
 # MoveSmart
 
-Moto, taxi and bus rides across Kigali. Riders see the fare in RWF before they book, get the nearest
+Moto, taxi and bus rides across Rwanda. Riders see the fare in RWF before they book, get the nearest
 available driver, pay with MTN MoMo, Airtel Money or cash, share their trip and report safety problems.
 
 This is a standalone React + TypeScript project (Vite, Tailwind CSS, shadcn/ui) with a Supabase backend.
 It does not depend on Lovable.
 
-## Run it on your computer
+## Run it in VS Code
 
-You need [Node.js](https://nodejs.org) 18 or newer.
+1. Install [Node.js](https://nodejs.org) (the LTS version) and [VS Code](https://code.visualstudio.com).
+2. Unzip the project, then in VS Code choose **File → Open Folder…** and pick the `MoveSmart` folder.
+   Accept the prompt to install the recommended extensions (ESLint, Tailwind CSS IntelliSense, Prettier).
+3. Open the terminal (**Terminal → New Terminal**, or <kbd>Ctrl</kbd>+<kbd>`</kbd>) and run:
 
-```bash
-npm install
-npm run dev
-```
+   ```bash
+   npm install
+   npm run dev
+   ```
 
-The app opens at http://localhost:8080.
+4. Open http://localhost:8080 in your browser (<kbd>Ctrl</kbd>+click the link in the terminal).
+
+Or press <kbd>F5</kbd> and choose **Run MoveSmart in Chrome** (or Edge): VS Code starts the dev server and opens the
+app with the debugger attached, so breakpoints in `src/` work.
 
 Demo login: `demo@movesmart.rw` / `MoveSmart@2026` (or click **Use demo account** on the sign-in page).
 
-Other commands:
+| Command             | What it does                                  |
+| ------------------- | --------------------------------------------- |
+| `npm run dev`       | Start the app locally with live reload        |
+| `npm run build`     | Build the production site into `dist/`        |
+| `npm run preview`   | Serve the built site locally to check it      |
+| `npm run typecheck` | Check the TypeScript types                    |
+| `npm run lint`      | Check the code for common problems            |
 
-| Command           | What it does                                  |
-| ----------------- | --------------------------------------------- |
-| `npm run dev`     | Start the app locally with live reload        |
-| `npm run build`   | Build the production site into `dist/`        |
-| `npm run preview` | Serve the built site locally to check it      |
-| `npm run lint`    | Check the code for common problems            |
+The same commands are available in VS Code under **Terminal → Run Task…**.
+
+If port 8080 is busy, close the other program using it or change `port` in `vite.config.ts` (and the URL in
+`.vscode/launch.json`).
 
 ## Backend (Supabase)
 
@@ -45,6 +55,9 @@ To use your own Supabase project instead:
 
 ## Features
 
+- **3D map of Rwanda** (`/map`): real terrain from AWS Terrain Tiles, OpenStreetMap streets and 3D buildings
+  (OpenFreeMap), optional satellite imagery (Esri), towns in every province, bus routes, vehicles and hospitals.
+  No API key needed. The journey planner's 3D view uses the same map.
 - **Homepage** with a live fare check: pick a destination and compare moto, taxi and bus prices.
 - **Journey planner** (`/planner`, no account needed): fastest, safest and balanced routes with traffic, rain
   and hazards; trip briefing with the best time to leave and a preparation checklist; animated journey preview;
@@ -52,7 +65,8 @@ To use your own Supabase project instead:
   What-If simulator; **Community Eyes** road reports shared through the database; "Book this trip" hands the
   route to booking. Traffic, weather and hazards are sample data on a schematic map.
 - **Sign up / sign in**, including a one-click demo account.
-- **Book a ride**: Kigali place search (built-in places plus Mapbox limited to Rwanda), "use my location",
+- **Book a ride** anywhere in Rwanda: Kigali landmarks and towns in all five provinces (plus Mapbox search limited
+  to Rwanda), "use my location", intercity fares and travel times,
   distance, time and RWF fare per vehicle type, nearest-vehicle matching.
 - **Current trip**: vehicle and plate, "I've arrived", share trip via WhatsApp, safety report, cancel with confirmation.
 - **After the trip**: pay with MTN MoMo / Airtel Money (simulated) or cash, rate 1–5 stars, report an issue.

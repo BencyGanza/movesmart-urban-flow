@@ -1,0 +1,16 @@
+{
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "editor.formatOnSave": false,
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+  "tailwindCSS.experimental.classRegex": [
+    [
+      "className=\"([^\"]*)\""
+    ]
+  ],
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true
+  }
+}

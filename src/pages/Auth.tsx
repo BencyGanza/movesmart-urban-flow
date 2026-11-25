@@ -112,7 +112,7 @@ const Auth = () => {
         {/* Brand panel */}
         <div className="hidden lg:flex flex-col justify-center px-16 text-white" style={{ background: "hsl(197 100% 24%)" }}>
           <h1 className="text-4xl font-semibold tracking-tight leading-tight max-w-md">
-            Getting around Kigali, made simple.
+            Getting around Rwanda, made simple.
           </h1>
           <ul className="mt-8 space-y-4">
             {benefits.map((b) => (

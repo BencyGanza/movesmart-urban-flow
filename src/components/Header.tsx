@@ -10,6 +10,7 @@ import movesmartLogo from "@/assets/movesmart-logo.png";
 const publicLinks = [
   { to: "/", label: "Home" },
   { to: "/planner", label: "Journey planner" },
+  { to: "/map", label: "Rwanda map" },
   { to: "/smart-traffic", label: "Smart traffic" },
   { to: "/about", label: "About" },
   { to: "/help", label: "Help" },
@@ -53,7 +54,7 @@ export const Header = () => {
             <span className="text-xl font-semibold tracking-tight">MoveSmart</span>
           </Link>
 
-          <nav className="hidden lg:flex items-center gap-7" aria-label="Main">
+          <nav className="hidden xl:flex items-center gap-6" aria-label="Main">
             {links.map((l) => (
               <NavLink key={l.to} to={l.to} end={l.to === "/"} className={linkClass}>
                 {l.label}
@@ -61,7 +62,7 @@ export const Header = () => {
             ))}
           </nav>
 
-          <div className="hidden lg:flex items-center gap-2">
+          <div className="hidden xl:flex items-center gap-2">
             {isAuthenticated ? (
               <Button variant="ghost" size="sm" onClick={handleSignOut}>
                 <LogOut className="w-4 h-4 mr-2" /> Sign out
@@ -80,7 +81,7 @@ export const Header = () => {
 
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Open menu">
+              <Button variant="ghost" size="icon" className="xl:hidden" aria-label="Open menu">
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Bike, CreditCard, Map, Route, ShieldCheck, TrafficCone } from "lucide-react";
 
 const features = [
-  { Icon: Bike, title: "Moto, taxi and bus in one app", body: "Book the nearest available vehicle, with the fare in RWF shown before you confirm." },
+  { Icon: Bike, title: "Moto, taxi and bus in one app", body: "Book the nearest available vehicle in Kigali or any main town, with the fare in RWF shown before you confirm." },
   { Icon: Route, title: "Journey planner", body: "Compare the fastest, safest and best-balanced routes, with traffic, rain and road hazards along the way." },
   { Icon: CreditCard, title: "Pay the local way", body: "MTN MoMo, Airtel Money or cash. Mobile money is simulated in this demo version." },
   { Icon: ShieldCheck, title: "Safety built in", body: "Share your trip on WhatsApp, report problems, rate drivers and reach 112 quickly." },
@@ -16,6 +16,7 @@ const features = [
 
 const guide = [
   { page: "Home", what: "An overview of MoveSmart and a quick fare check." },
+  { page: "Rwanda map", what: "A 3D map of the whole country with towns, bus routes, vehicles and hospitals." },
   { page: "Journey planner", what: "Plan a trip, compare routes, check conditions and try What-If scenarios. No account needed." },
   { page: "My rides", what: "Book a ride, follow your current trip, pay, rate and see your history. Needs an account." },
   { page: "Smart traffic", what: "Our proposal for AI-assisted traffic management, shown with simulated data." },
@@ -36,7 +37,7 @@ const About = () => {
       <Header />
       <PageHeader
         title="About MoveSmart"
-        description="MoveSmart makes getting around Kigali simpler and safer: fair prices you can see, the nearest driver, and the information you need before you set off."
+        description="MoveSmart makes getting around Rwanda simpler and safer: fair prices you can see, the nearest driver, and the information you need before you set off."
       />
 
       <main>
@@ -45,8 +46,8 @@ const About = () => {
             <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">Our mission</h2>
             <div className="mt-4 space-y-4 text-muted-foreground leading-relaxed max-w-xl">
               <p>
-                Every day thousands of people in Kigali negotiate moto fares, wait for buses without knowing when they
-                will come, and get caught by rain on flood-prone roads. MoveSmart brings booking, fares, route planning
+                Every day thousands of people across Rwanda negotiate moto fares, wait for buses without knowing when
+                they will come, and get caught by rain on flood-prone roads. MoveSmart brings booking, fares, route planning
                 and safety tools together in one place.
               </p>
               <p>

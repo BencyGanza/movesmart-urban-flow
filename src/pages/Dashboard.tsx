@@ -28,6 +28,7 @@ import {
   VEHICLE_OPTIONS,
   estimateFare,
   estimateMinutes,
+  formatMinutes,
   formatRwf,
   roadDistanceKm,
 } from "@/lib/kigali";
@@ -206,7 +207,7 @@ const Dashboard = () => {
           <h1 className="text-2xl md:text-3xl font-bold">
             Muraho{profile?.full_name ? `, ${profile.full_name.split(" ")[0]}` : ""} 👋
           </h1>
-          <p className="text-muted-foreground">Where are you going in Kigali today?</p>
+          <p className="text-muted-foreground">Where are you going today?</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -217,7 +218,7 @@ const Dashboard = () => {
                 <CardTitle className="flex items-center gap-2">
                   <Navigation className="h-5 w-5 text-primary" /> Book a ride
                 </CardTitle>
-                <CardDescription>Search a place in Kigali or use your current location.</CardDescription>
+                <CardDescription>Search a place anywhere in Rwanda or use your current location.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <PlaceSearch
@@ -232,7 +233,7 @@ const Dashboard = () => {
                 <PlaceSearch
                   id="dropoff"
                   label="Destination"
-                  placeholder="e.g. Kimironko Market"
+                  placeholder="e.g. Kimironko Market or Musanze"
                   value={dropoff}
                   onChange={setDropoff}
                   icon={<Navigation className="h-4 w-4 text-secondary" />}
@@ -272,7 +273,7 @@ const Dashboard = () => {
                     </div>
                     <div>
                       <p className="text-xs text-muted-foreground">Time</p>
-                      <p className="font-semibold">~{estimate.minutes} min</p>
+                      <p className="font-semibold">~{formatMinutes(estimate.minutes)}</p>
                     </div>
                     <div>
                       <p className="text-xs text-muted-foreground">Estimated fare</p>
@@ -320,7 +321,7 @@ const Dashboard = () => {
                       </div>
                       <div className="text-right">
                         <p className="font-bold">{formatRwf(ride.estimated_fare)}</p>
-                        <p className="text-xs text-muted-foreground">~{ride.estimated_duration_minutes ?? "?"} min</p>
+                        <p className="text-xs text-muted-foreground">{ride.estimated_duration_minutes ? `~${formatMinutes(ride.estimated_duration_minutes)}` : ""}</p>
                       </div>
                     </div>
                   ) : (

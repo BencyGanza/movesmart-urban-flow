@@ -8,6 +8,7 @@ const columns = [
     links: [
       { to: "/dashboard", label: "Book a ride" },
       { to: "/planner", label: "Journey planner" },
+      { to: "/map", label: "3D map of Rwanda" },
       { to: "/#how-it-works", label: "How it works" },
       { to: "/#features", label: "Features" },
       { to: "/#safety", label: "Safety" },
@@ -33,7 +34,7 @@ export const Footer = () => (
           <span className="text-xl font-semibold">MoveSmart</span>
         </div>
         <p className="mt-4 text-sm text-background/70 leading-relaxed">
-          Moto, taxi and bus rides across Kigali, with fares you can see before you go.
+          Moto, taxi and bus rides across Rwanda, with fares you can see before you go.
         </p>
       </div>
 

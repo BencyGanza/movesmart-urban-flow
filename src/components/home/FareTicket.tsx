@@ -3,22 +3,25 @@ import { useNavigate } from "react-router-dom";
 import { Bike, Bus, Car } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
-  KIGALI_PLACES,
+  ALL_PLACES,
   VehicleType,
   estimateFare,
   estimateMinutes,
+  formatMinutes,
   formatRwf,
   roadDistanceKm,
 } from "@/lib/kigali";
 
-const FROM = KIGALI_PLACES.find((p) => p.name.startsWith("Nyabugogo"))!;
+const FROM = ALL_PLACES.find((p) => p.name.startsWith("Nyabugogo"))!;
 const DESTINATIONS = [
   "Kimironko Market",
   "Remera (Giporoso)",
   "Kicukiro Centre",
   "Kigali International Airport (Kanombe)",
   "Nyamirambo",
-].map((n) => KIGALI_PLACES.find((p) => p.name === n)!);
+  "Musanze (Ruhengeri)",
+  "Huye (Butare)",
+].map((n) => ALL_PLACES.find((p) => p.name === n)!);
 
 const shortName = (name: string) => name.replace(/ \(.*\)$/, "").replace(" International", "");
 
@@ -28,7 +31,7 @@ const rows: { type: VehicleType; label: string; Icon: typeof Bike }[] = [
   { type: "bus", label: "Bus", Icon: Bus },
 ];
 
-/** A ride ticket that prices a real trip across Kigali with the same rules the app uses. */
+/** A ride ticket that prices a real trip with the same rules the app uses. */
 export const FareTicket = () => {
   const navigate = useNavigate();
   const [to, setTo] = useState(DESTINATIONS[0]);
@@ -79,7 +82,7 @@ export const FareTicket = () => {
               </span>
               <span className="flex-1">
                 <span className="font-medium">{label}</span>
-                <span className="block text-xs text-muted-foreground">about {estimateMinutes(type, km)} min</span>
+                <span className="block text-xs text-muted-foreground">about {formatMinutes(estimateMinutes(type, km))}</span>
               </span>
               <span className="font-semibold tabular-nums">{formatRwf(estimateFare(type, km))}</span>
             </li>

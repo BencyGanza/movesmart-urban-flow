@@ -53,9 +53,12 @@ export class RideService {
     if (error) throw error;
     if (!data?.length) return null;
 
-    return data
+    // Only offer vehicles close enough to come and pick the rider up
+    const MAX_PICKUP_KM = 30;
+    const nearest = data
       .map((v) => ({ ...v, distance: distanceKm(pickup, { lat: v.current_latitude!, lng: v.current_longitude! }) }))
       .sort((a, b) => a.distance - b.distance)[0];
+    return nearest && nearest.distance <= MAX_PICKUP_KM ? nearest : null;
   }
 
   static async getUserRides(userId: string) {

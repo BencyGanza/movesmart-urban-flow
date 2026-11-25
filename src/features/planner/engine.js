@@ -18,16 +18,14 @@ const MARKUP = `
 <div class="app">
   <div class="mapw" id="nx-mapw">
     <svg class="map" id="nx-map" role="img" aria-label="Schematic journey map of Kigali"></svg>
-    <div class="v3" id="nx-v3"><div class="v3lab" id="nx-v3lab"></div>
+    <div class="v3" id="nx-v3"><div class="v3map" id="nx-v3map"></div>
       <div class="v3msg" id="nx-v3msg"></div>
       <div class="v3ctl">
-        <button data-v="rl" aria-label="Rotate left">⟲</button><button data-v="up" aria-label="Tilt up">▲</button><button data-v="rr" aria-label="Rotate right">⟳</button>
-        <button data-v="zi" aria-label="Zoom in">+</button><button data-v="dn" aria-label="Tilt down">▼</button><button data-v="zo" aria-label="Zoom out">−</button>
-        <button data-v="fo" aria-label="Focus start">A</button><button data-v="ov" aria-label="Whole city">All</button><button data-v="fd" aria-label="Focus destination">B</button>
+        <button data-v="fo" aria-label="Fly to start">A</button><button data-v="ov" aria-label="Show the whole route">Route</button><button data-v="fd" aria-label="Fly to destination">B</button>
       </div>
     </div>
     <div class="mtool">
-      <div class="seg"><button id="nx-m2" aria-pressed="true">2D map</button><button id="nx-m3" aria-pressed="false">3D view</button></div>
+      <div class="seg"><button id="nx-m2" aria-pressed="true">2D map</button><button id="nx-m3" aria-pressed="false">3D map</button></div>
       <button class="chip" data-l="traffic" aria-pressed="true">Traffic</button>
       <button class="chip" data-l="weather" aria-pressed="true">Weather</button>
       <button class="chip" data-l="hazards" aria-pressed="true">Hazards</button>
@@ -315,7 +313,7 @@ export function mountPlanner(root, opts = {}) {
   function hideInfo() { info.classList.remove('on'); }
   info.addEventListener('click', (ev) => {
     const b = ev.target.closest('button'); if (!b) return; if (b.classList.contains('x')) return hideInfo();
-    const a = b.dataset.a, id = b.dataset.id; if (a == 'o') { S.o = id; sync(); go(); } if (a == 'd') { S.d = id; sync(); go(); } if (a == '3d') { setMode('3d'); T && focus3(N[id]); }
+    const a = b.dataset.a, id = b.dataset.id; if (a == 'o') { S.o = id; sync(); go(); } if (a == 'd') { S.d = id; sync(); go(); } if (a == '3d') { setMode('3d'); if (T) focus3(N[id]); }
   });
   function infoNode(id) {
     const n = N[id], w = wxAt(n.x, n.y, BASE.ctx.dep, BASE.ctx);
@@ -552,12 +550,12 @@ export function mountPlanner(root, opts = {}) {
   function setTab(t) { S.tab = t; renderPanel(); panel.scrollTop = 0; }
   $('#nx-tabs').addEventListener('click', (ev) => { const b = ev.target.closest('button'); if (!b) return; setTab(b.dataset.t); });
   function syncChips() { $$('.chip[data-l]').forEach((c) => c.setAttribute('aria-pressed', !!S.layers[c.dataset.l])); }
-  $$('.chip[data-l]').forEach((c) => c.addEventListener('click', () => { S.layers[c.dataset.l] = S.layers[c.dataset.l] ? 0 : 1; syncChips(); renderMap(); }));
+  $$('.chip[data-l]').forEach((c) => c.addEventListener('click', () => { S.layers[c.dataset.l] = S.layers[c.dataset.l] ? 0 : 1; syncChips(); renderMap(); build3Routes(); }));
   $('#nx-m2').addEventListener('click', () => setMode('2d')); $('#nx-m3').addEventListener('click', () => setMode('3d'));
   function setMode(m) {
     S.mode = m; $('#nx-m2').setAttribute('aria-pressed', m == '2d'); $('#nx-m3').setAttribute('aria-pressed', m == '3d');
     $('#nx-v3').classList.toggle('on', m == '3d'); $('#nx-zoom').style.display = m == '2d' ? '' : 'none'; $('#nx-legend').style.display = m == '2d' ? '' : 'none';
-    if (m == '3d') { hideInfo(); T ? (build3Routes(), resize3(), draw3()) : load3D(); } else renderMap();
+    if (m == '3d') { hideInfo(); T ? (build3Routes(), resize3()) : load3D(); } else renderMap();
   }
   function renderAll(anim) { renderMap(anim); renderPanel(); if (T) build3Routes(); }
   function go(keep) {
@@ -566,103 +564,96 @@ export function mountPlanner(root, opts = {}) {
     store.set('trip', { o: S.o, d: S.d, sel: S.sel });
     BASE = plan(null); BASE.adv = advise(); if (P.on) { P.t = 0; P.play = 0; }
     if (S.sim && !keep) S.sim = null; else if (S.sim) { runSim(); return; }
-    if (!keep) { fit(); hideInfo(); } renderAll(!keep); if (T && !keep) focus3(N[S.d]);
+    if (!keep) { fit(); hideInfo(); } renderAll(!keep); if (T && !keep) fitRoute3();
   }
 
-  /* ---------- 3D view (illustrative) ---------- */
+  /* ---------- 3D view: real terrain map of Rwanda (MapLibre) ---------- */
   let T = null;
-  const V3MSG = `<span class="tag k-model">Illustrative model</span> Terrain and buildings are generated, not a live 3D capture of the place. Drag to rotate, scroll to zoom, tap a building.`;
-  function hgt(x, y) { let z = 0; for (const [hx, hy, a, r] of HILLS) z += a * Math.exp(-((x - hx) ** 2 + (y - hy) ** 2) / (2 * r * r)); for (const [wx, wy, rx] of WET) z -= 1.2 * Math.exp(-((x - wx) ** 2 + (y - wy) ** 2) / (2 * rx * rx * .5)); return z; }
+  const V3MSG = `<span class="tag k-live">Real terrain</span> Real 3D map of Kigali. The route is drawn as straight lines between places; traffic, weather and hazards are sample data. Right-drag to tilt and rotate.`;
+  // Least-squares affine fit from schematic map units to real longitude/latitude, using the 20 places.
+  const AFF = (() => {
+    const ks = Object.keys(N), rows = ks.map((k) => [N[k].x, N[k].y, 1]);
+    const solve3 = (A, b) => { // Gaussian elimination for a 3x3 system
+      const M = A.map((r, i) => [...r, b[i]]);
+      for (let c = 0; c < 3; c++) {
+        let p = c; for (let r = c + 1; r < 3; r++) if (Math.abs(M[r][c]) > Math.abs(M[p][c])) p = r;
+        [M[c], M[p]] = [M[p], M[c]];
+        for (let r = 0; r < 3; r++) if (r != c) { const f = M[r][c] / M[c][c]; for (let k = c; k < 4; k++) M[r][k] -= f * M[c][k]; }
+      }
+      return [M[0][3] / M[0][0], M[1][3] / M[1][1], M[2][3] / M[2][2]];
+    };
+    const fit = (vals) => {
+      const AtA = [0, 1, 2].map((i) => [0, 1, 2].map((j) => rows.reduce((s, r) => s + r[i] * r[j], 0)));
+      const Atb = [0, 1, 2].map((i) => rows.reduce((s, r, n) => s + r[i] * vals[n], 0));
+      return solve3(AtA, Atb);
+    };
+    return { lng: fit(ks.map((k) => NODE_LL[k][1])), lat: fit(ks.map((k) => NODE_LL[k][0])) };
+  })();
+  const toLL = (x, y) => [AFF.lng[0] * x + AFF.lng[1] * y + AFF.lng[2], AFF.lat[0] * x + AFF.lat[1] * y + AFF.lat[2]];
+  const nodeLL = (k) => [NODE_LL[k][1], NODE_LL[k][0]];
+
   function load3D() {
-    $('#nx-v3msg').textContent = 'Loading 3D view…';
-    import('three').then((TH) => { if (disposed) return; try { init3D(TH); } catch (e) { $('#nx-v3msg').textContent = '3D view is not available on this device. The 2D map still works.'; } },
-      () => { $('#nx-v3msg').textContent = 'The 3D view could not load. The 2D map still works.'; });
+    $('#nx-v3msg').textContent = 'Loading the 3D map…';
+    import('../map/rwandaMap').then((M) => { if (disposed) return; try { init3D(M); } catch (e) { $('#nx-v3msg').textContent = 'The 3D map is not available on this device. The 2D map still works.'; } },
+      () => { $('#nx-v3msg').textContent = 'The 3D map could not load. Check your internet connection; the 2D map still works.'; });
   }
-  function init3D(TH) {
-    const box = $('#nx-v3'); const v = (x, y, l = 0) => new TH.Vector3((x - 500) / 10, hgt(x, y) + l, (y - 350) / 10);
-    const ren = new TH.WebGLRenderer({ antialias: true, alpha: true }); ren.setPixelRatio(Math.min(2, devicePixelRatio)); box.prepend(ren.domElement);
-    const sc = new TH.Scene(), cam = new TH.PerspectiveCamera(45, 1, .1, 600);
-    sc.add(new TH.HemisphereLight(0xeef6ff, 0x4a5a40, .62)); const dl = new TH.DirectionalLight(0xffffff, .6); dl.position.set(-30, 50, 20); sc.add(dl);
-    const geo = new TH.PlaneGeometry(130, 100, 150, 115); geo.rotateX(-Math.PI / 2); const pos = geo.attributes.position, col = [];
-    for (let i = 0; i < pos.count; i++) {
-      const mx = pos.getX(i) * 10 + 500, my = pos.getZ(i) * 10 + 350, z = hgt(mx, my); pos.setY(i, z);
-      const wet = z < -.35, t = Math.min(1, Math.max(0, z / 9)); col.push(...(wet ? [.48, .64, .72] : [.5 - .2 * t, .6 - .2 * t, .42 - .16 * t]));
-    }
-    geo.setAttribute('color', new TH.Float32BufferAttribute(col, 3)); geo.computeVertexNormals();
-    const terr = new TH.Mesh(geo, new TH.MeshLambertMaterial({ vertexColors: true })); sc.add(terr);
-    const roadM = new TH.LineBasicMaterial({ color: 0x5b6660 });
-    for (const e of E) { const A = N[e.a], B = N[e.b], pts = []; for (let k = 0; k <= 20; k++) { const x = A.x + (B.x - A.x) * k / 20, y = A.y + (B.y - A.y) * k / 20; pts.push(v(x, y, .08)); } sc.add(new TH.Line(new TH.BufferGeometry().setFromPoints(pts), roadM)); }
-    let seed = 7; const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
-    const bg = new TH.BoxGeometry(1, 1, 1), bm = new TH.MeshLambertMaterial({ color: 0xe2e5e8 }), blds = new TH.Group();
-    for (const k in N) {
-      const n = N[k], cnt = k == 'CBD' ? 80 : k == 'AIR' ? 10 : 26, rad = k == 'CBD' ? 42 : 30;
-      for (let j = 0; j < cnt; j++) {
-        const a = rnd() * 6.283, d = 8 + rnd() * rad, x = n.x + Math.cos(a) * d, y = n.y + Math.sin(a) * d;
-        if (nearestEdge(x, y).d < 5) continue; const fl = k == 'CBD' ? 2 + Math.floor(rnd() * rnd() * 16) : 1 + Math.floor(rnd() * 3), w = .5 + rnd() * .7, hh = fl * .28;
-        const m = new TH.Mesh(bg, bm); m.scale.set(w, hh, .5 + rnd() * .7); m.position.copy(v(x, y, hh / 2 - .05)); m.rotation.y = rnd() * 3; m.userData = { k, fl }; blds.add(m);
-      }
-    }
-    sc.add(blds);
-    const hzG = new TH.Group(), cone = new TH.ConeGeometry(.5, 1.4, 10); cone.rotateX(Math.PI);
-    for (const z of HZ) { const m = new TH.Mesh(cone, new TH.MeshLambertMaterial({ color: z.src == 'verified' ? 0xd62828 : z.src == 'official' ? 0x0b6b8a : 0xe08a10 })); m.position.copy(v(z.x, z.y, 1.6)); m.userData = { hz: z }; hzG.add(m); } sc.add(hzG);
-    $('#nx-v3lab').innerHTML = Object.values(N).map((n) => `<div data-n="${n.id}">${esc(n.n)}</div>`).join('');
-    T = { TH, ren, sc, cam, terr, blds, hzG, routes: new TH.Group(), v, o: { t: v(N[S.d].x, N[S.d].y), r: 32, th: .5, ph: .95 }, sel: null }; sc.add(T.routes);
+  function init3D(M) {
+    const box = $('#nx-v3map');
+    const d = N[S.d];
+    const map = M.createRwandaMap(box, {
+      center: toLL(d.x, d.y), zoom: 12.3, pitch: 62, bearing: -25,
+      onReady: (m) => {
+        if (disposed) return;
+        m.addSource('nx-routes', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+        m.addLayer({ id: 'nx-routes-casing', type: 'line', source: 'nx-routes', layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': '#ffffff', 'line-width': ['case', ['get', 'sel'], 11, 7], 'line-opacity': 0.9 } });
+        m.addLayer({ id: 'nx-routes', type: 'line', source: 'nx-routes', layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': ['get', 'color'], 'line-width': ['case', ['get', 'sel'], 6, 3.5], 'line-opacity': ['case', ['get', 'sel'], 1, 0.7] } });
+        m.addSource('nx-points', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+        m.addLayer({ id: 'nx-points', type: 'circle', source: 'nx-points', paint: { 'circle-radius': ['interpolate', ['linear'], ['zoom'], 10, 5, 15, 9], 'circle-color': ['get', 'color'], 'circle-stroke-color': '#ffffff', 'circle-stroke-width': 2 } });
+        m.on('click', 'nx-points', (e) => {
+          const f = e.features && e.features[0]; if (!f) return; const { kind, id } = f.properties;
+          if (kind == 'h') infoHz(HZ.find((z) => z.id == id)); else if (kind == 's') infoSvc(SV[+id]); else if (kind == 'c') infoRep(REPS.find((r) => String(r.id) == String(id)));
+        });
+        m.on('mouseenter', 'nx-points', () => { m.getCanvas().style.cursor = 'pointer'; });
+        m.on('mouseleave', 'nx-points', () => { m.getCanvas().style.cursor = ''; });
+        T.ready = true; build3Routes(); fitRoute3(0);
+      },
+      onError: () => { $('#nx-v3msg').textContent = 'The 3D map could not load. Check your internet connection; the 2D map still works.'; },
+    });
+    T = { M, map, ready: false, marks: [] };
     $('#nx-v3msg').innerHTML = V3MSG;
-    const cv = ren.domElement; let dg = null;
-    cv.addEventListener('pointerdown', (e) => { dg = { x: e.clientX, y: e.clientY, m: 0 }; cv.setPointerCapture(e.pointerId); });
-    cv.addEventListener('pointermove', (e) => {
-      if (!dg) return; const dx = e.clientX - dg.x, dy = e.clientY - dg.y; if (Math.abs(dx) + Math.abs(dy) > 4) dg.m = 1; if (!dg.m) return;
-      T.o.th -= dx * .006; T.o.ph = Math.min(1.45, Math.max(.25, T.o.ph - dy * .005)); dg.x = e.clientX; dg.y = e.clientY; draw3();
-    });
-    cv.addEventListener('pointerup', (e) => { const d = dg; dg = null; if (d && !d.m) pick3(e); });
-    cv.addEventListener('wheel', (e) => { e.preventDefault(); T.o.r = Math.min(140, Math.max(6, T.o.r * (e.deltaY > 0 ? 1.12 : 1 / 1.12))); draw3(); }, { passive: false });
-    const ro3 = new ResizeObserver(() => { resize3(); draw3(); }); ro3.observe(box); observers.push(ro3);
-    build3Routes(); resize3(); draw3();
+    const ro3 = new ResizeObserver(() => map.resize()); ro3.observe(box); observers.push(ro3);
   }
-  function resize3() { if (!T) return; const b = $('#nx-v3'), w = b.clientWidth || 600, h = b.clientHeight || 400; T.ren.setSize(w, h, false); T.ren.domElement.style.width = '100%'; T.ren.domElement.style.height = '100%'; T.cam.aspect = w / h; T.cam.updateProjectionMatrix(); }
+  function resize3() { if (T) T.map.resize(); }
   function build3Routes() {
-    if (!T) return; const { TH, routes, v } = T, R = cur(); while (routes.children.length) routes.remove(routes.children[0]);
+    if (!T || !T.ready) return; const { map, M } = T, R = cur(), L = S.layers;
+    const colors = { fast: '#2563eb', safe: '#0e9f8e', bal: '#c2417a' };
+    const feats = [];
     for (const m of ['fast', 'safe', 'bal']) {
-      const r = R[m]; if (!r || (m != S.sel && same(r, R[S.sel]))) continue; const pts = [];
-      r.segs.forEach((s, idx) => { const fwd = r.nodes[idx] == s.e.a, A = N[fwd ? s.e.a : s.e.b], B = N[fwd ? s.e.b : s.e.a]; for (let k = 0; k < 12; k++) pts.push(v(A.x + (B.x - A.x) * k / 12, A.y + (B.y - A.y) * k / 12, .35)); });
-      const L = N[S.d]; pts.push(v(L.x, L.y, .35)); if (pts.length < 2) continue;
-      const tube = new TH.Mesh(new TH.TubeGeometry(new TH.CatmullRomCurve3(pts), pts.length * 2, m == S.sel ? .32 : .16, 6), new TH.MeshBasicMaterial({ color: { fast: 0x2563eb, safe: 0x0e9f8e, bal: 0xc2417a }[m], transparent: m != S.sel, opacity: m == S.sel ? 1 : .55 })); routes.add(tube);
+      const r = R[m]; if (!r || (m != S.sel && same(r, R[S.sel]))) continue;
+      feats.push({ type: 'Feature', properties: { mode: m, sel: m == S.sel, color: colors[m] }, geometry: { type: 'LineString', coordinates: r.nodes.map(nodeLL) } });
     }
+    feats.sort((a, b) => (a.properties.sel ? 1 : 0) - (b.properties.sel ? 1 : 0));
+    map.getSource('nx-routes').setData({ type: 'FeatureCollection', features: feats });
+    const pts = [];
+    if (L.hazards) for (const z of HZ) pts.push({ type: 'Feature', properties: { kind: 'h', id: z.id, color: { historical: '#b8860b', official: '#0b6b8a', verified: '#d62828' }[z.src] }, geometry: { type: 'Point', coordinates: toLL(z.x, z.y) } });
+    if (L.services) for (const s of SV) pts.push({ type: 'Feature', properties: { kind: 's', id: s.i, color: SVC[s.c] }, geometry: { type: 'Point', coordinates: toLL(s.x, s.y) } });
+    if (L.community) for (const r of REPS) { const st = repStatus(r); pts.push({ type: 'Feature', properties: { kind: 'c', id: String(r.id), color: st == 'confirmed' ? '#a34fbf' : st == 'cleared' ? '#8a958f' : '#8a5a9e' }, geometry: { type: 'Point', coordinates: toLL(r.x, r.y) } }); }
+    map.getSource('nx-points').setData({ type: 'FeatureCollection', features: pts });
+    for (const mk of T.marks) mk.remove(); T.marks = [];
     for (const k of [S.o, S.d]) {
-      const n = N[k], p = new TH.Mesh(new TH.CylinderGeometry(.12, .12, 3, 8), new TH.MeshBasicMaterial({ color: 0x102a43 })); p.position.copy(v(n.x, n.y, 1.5)); routes.add(p);
-      const s = new TH.Mesh(new TH.SphereGeometry(.55, 16, 12), new TH.MeshBasicMaterial({ color: k == S.o ? 0x102a43 : 0x0078a8 })); s.position.copy(v(n.x, n.y, 3.2)); routes.add(s);
+      const el = M.makeMarkerEl({ badge: k == S.o ? 'A' : 'B', color: k == S.o ? '#102A43' : '#0078A8', size: 24, label: N[k].n, title: N[k].n });
+      T.marks.push(new M.maplibregl.Marker({ element: el, anchor: 'bottom', opacityWhenCovered: '1' }).setLngLat(nodeLL(k)).addTo(map));
     }
-    draw3();
   }
-  function focus3(n, r) { if (!T) return; T.o.t = T.v(n.x, n.y); T.o.r = r || 32; draw3(); }
-  let pend = false;
-  function draw3() {
-    if (!T || pend || disposed) return; pend = true; requestAnimationFrame(() => {
-      pend = false; if (disposed) return; const { cam, o } = T;
-      cam.position.set(o.t.x + o.r * Math.sin(o.ph) * Math.sin(o.th), o.t.y + o.r * Math.cos(o.ph), o.t.z + o.r * Math.sin(o.ph) * Math.cos(o.th)); cam.lookAt(o.t); T.ren.render(T.sc, cam);
-      const W = T.ren.domElement.clientWidth, H = T.ren.domElement.clientHeight;
-      for (const el of $$('#nx-v3lab div')) {
-        const n = N[el.dataset.n], p = T.v(n.x, n.y, 1.2).project(cam), od = n.id == S.o || n.id == S.d;
-        el.className = od ? 'od' : ''; el.textContent = (n.id == S.o ? 'A · ' : n.id == S.d ? 'B · ' : '') + n.n;
-        const vis = p.z < 1 && Math.abs(p.x) < 1.1 && Math.abs(p.y) < 1.1 && (od || o.r < 70); el.style.display = vis ? '' : 'none'; if (vis) { el.style.left = (p.x + 1) / 2 * W + 'px'; el.style.top = (1 - p.y) / 2 * H + 'px'; }
-      }
-    });
+  function fitRoute3(duration = 1600) {
+    if (!T || !T.ready) return; const R = cur(), r = R[S.sel] || R.fast; const pts = (r ? r.nodes : [S.o, S.d]).map(nodeLL);
+    const lngs = pts.map((p) => p[0]), lats = pts.map((p) => p[1]);
+    T.map.fitBounds([[Math.min(...lngs), Math.min(...lats)], [Math.max(...lngs), Math.max(...lats)]], { padding: 90, pitch: 60, bearing: -25, duration });
   }
-  function pick3(e) {
-    const { TH, cam, ren } = T, rc = ren.domElement.getBoundingClientRect(), m = new TH.Vector2((e.clientX - rc.left) / rc.width * 2 - 1, -(e.clientY - rc.top) / rc.height * 2 + 1), ray = new TH.Raycaster(); ray.setFromCamera(m, cam);
-    if (T.sel) { T.sel.material = T.blds.children.find((b) => b !== T.sel).material; T.sel = null; }
-    const hz = ray.intersectObjects(T.hzG.children)[0]; if (hz) { infoHz(hz.object.userData.hz); draw3(); return; }
-    const b = ray.intersectObjects(T.blds.children)[0];
-    if (b) {
-      const u = b.object.userData; b.object.material = new TH.MeshLambertMaterial({ color: 0x0078a8 }); T.sel = b.object;
-      showInfo(`<h4>Building near ${esc(N[u.k].n)}</h4>${tag('model')}<p style="margin:6px 0 0">Generated placeholder, about ${u.fl} floor${u.fl > 1 ? 's' : ''}. There is no verified 3D model of this building, so its shape and height are illustrative.</p>`); draw3(); return;
-    }
-    const t = ray.intersectObject(T.terr)[0]; if (t) { const mx = t.point.x * 10 + 500, my = t.point.z * 10 + 350, n = nearestNode(mx, my); infoNode(n.id); } draw3();
-  }
+  function focus3(n) { if (!T || !T.ready) return; T.map.flyTo({ center: nodeLL(n.id), zoom: 14.5, pitch: 65, essential: true }); }
   $('#nx-v3').addEventListener('click', (ev) => {
-    const b = ev.target.closest('.v3ctl button'); if (!b || !T) return; const o = T.o, k = b.dataset.v;
-    if (k == 'rl') o.th += .35; if (k == 'rr') o.th -= .35; if (k == 'up') o.ph = Math.max(.25, o.ph - .15); if (k == 'dn') o.ph = Math.min(1.45, o.ph + .15); if (k == 'zi') o.r = Math.max(6, o.r / 1.25); if (k == 'zo') o.r = Math.min(140, o.r * 1.25);
-    if (k == 'fo') focus3(N[S.o]); if (k == 'fd') focus3(N[S.d]); if (k == 'ov') { o.t = T.v(560, 360); o.r = 105; o.ph = .8; } draw3();
+    const b = ev.target.closest('.v3ctl button'); if (!b || !T) return; const k = b.dataset.v;
+    if (k == 'fo') focus3(N[S.o]); if (k == 'fd') focus3(N[S.d]); if (k == 'ov') fitRoute3();
   });
 
   /* ---------- Briefing, advisor, preparation ---------- */
@@ -738,7 +729,7 @@ export function mountPlanner(root, opts = {}) {
   return () => {
     disposed = true; P.play = 0;
     observers.forEach((o) => o.disconnect());
-    if (T) { try { T.ren.dispose(); } catch (e) { /* ignore */ } T = null; }
+    if (T) { try { T.map.remove(); } catch (e) { /* ignore */ } T = null; }
     root.innerHTML = '';
   };
 }

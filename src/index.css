@@ -171,3 +171,42 @@ All colors MUST be HSL.
   to { stroke-dashoffset: -400; }
 }
 .route-dash { animation: route-travel 12s linear infinite; }
+
+/* Markers on the MapLibre maps (Rwanda map and the planner's 3D view) */
+.ms-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  font-family: Lexend, system-ui, sans-serif;
+}
+.ms-marker-dot {
+  display: grid;
+  place-items: center;
+  border-radius: 9999px;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgb(16 42 67 / 0.45);
+}
+.ms-marker-badge {
+  border-radius: 5px;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+.ms-marker-label {
+  background: #fff;
+  color: #102a43;
+  border-radius: 6px;
+  padding: 1px 7px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 1px 4px rgb(16 42 67 / 0.3);
+}
+.ms-marker:focus-visible .ms-marker-dot { outline: 3px solid #0078a8; outline-offset: 2px; }
+.maplibregl-popup-content { font-family: Lexend, system-ui, sans-serif; border-radius: 10px; padding: 12px 14px; }

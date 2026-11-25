@@ -1,4 +1,4 @@
--- MoveSmart demo data for Kigali.
+-- MoveSmart demo data for Rwanda.
 -- Run this AFTER the files in supabase/migrations (in date order), in the Supabase SQL editor.
 -- Safe to run more than once.
 
@@ -22,6 +22,37 @@ values
   ('RB 455 Z', 'TVS Apache 150 (moto)', 'motorbike', 1, -1.9490, 30.1240, true, now()),
   ('RB 812 Y', 'Bajaj Boxer (moto)', 'motorbike', 1, -1.9775, 30.0430, true, now()),
   ('RB 301 X', 'Honda CB125 (moto)', 'motorbike', 1, -1.9430, 30.0590, true, now())
+on conflict (license_plate) do nothing;
+
+-- Intercity bus routes from Kigali (demo fares, not official RURA tariffs)
+insert into public.routes (name, start_point, end_point, start_latitude, start_longitude, end_latitude, end_longitude, distance_km, estimated_duration_minutes, base_fare, is_active)
+select * from (values
+  ('Kigali – Musanze', 'Nyabugogo Bus Park', 'Musanze bus park', -1.9395, 30.0445, -1.4996, 29.6344, 94, 130, 2550, true),
+  ('Kigali – Huye', 'Nyabugogo Bus Park', 'Huye bus park', -1.9395, 30.0445, -2.5967, 29.7394, 113, 153, 3000, true),
+  ('Kigali – Rubavu', 'Nyabugogo Bus Park', 'Rubavu bus park', -1.9395, 30.0445, -1.6944, 29.2564, 128, 172, 3400, true),
+  ('Kigali – Rwamagana', 'Nyabugogo Bus Park', 'Rwamagana bus park', -1.9395, 30.0445, -1.9487, 30.4347, 58, 85, 1650, true),
+  ('Kigali – Nyagatare', 'Nyabugogo Bus Park', 'Nyagatare bus park', -1.9395, 30.0445, -1.2938, 30.3275, 110, 150, 2950, true),
+  ('Kigali – Rusizi', 'Nyabugogo Bus Park', 'Rusizi bus park', -1.9395, 30.0445, -2.4846, 28.9075, 196, 253, 5100, true)
+) as v(name, sp, ep, sla, slo, ela, elo, d, m, f, a)
+where not exists (select 1 from public.routes r where r.name = v.name);
+
+-- Vehicles in towns outside Kigali
+insert into public.vehicles (license_plate, model, vehicle_type, capacity, current_latitude, current_longitude, is_active, last_location_update)
+values
+  ('RAD 615 N', 'Coaster (Volcano Express)', 'bus', 29, -1.4990, 29.6350, true, now()),
+  ('RB 221 M', 'TVS Apache 150 (moto)', 'motorbike', 1, -1.5010, 29.6320, true, now()),
+  ('RAE 742 H', 'Toyota Corolla', 'taxi', 4, -2.5960, 29.7400, true, now()),
+  ('RB 518 H', 'Bajaj Boxer (moto)', 'motorbike', 1, -2.5980, 29.7380, true, now()),
+  ('RAC 309 H', 'Yutong ZK6729', 'bus', 30, -2.5950, 29.7410, true, now()),
+  ('RB 633 G', 'Honda CB125 (moto)', 'motorbike', 1, -1.6950, 29.2570, true, now()),
+  ('RAF 455 G', 'Toyota RAV4', 'taxi', 4, -1.6940, 29.2600, true, now()),
+  ('RB 107 R', 'TVS Apache 150 (moto)', 'motorbike', 1, -1.9490, 30.4350, true, now()),
+  ('RAD 870 E', 'Coaster (Horizon Express)', 'bus', 29, -1.2940, 30.3280, true, now()),
+  ('RB 940 E', 'Bajaj Boxer (moto)', 'motorbike', 1, -1.2950, 30.3260, true, now()),
+  ('RAE 118 W', 'Toyota Corolla', 'taxi', 4, -2.4840, 28.9080, true, now()),
+  ('RB 377 W', 'Honda CB125 (moto)', 'motorbike', 1, -2.4850, 28.9070, true, now()),
+  ('RB 590 S', 'TVS Apache 150 (moto)', 'motorbike', 1, -2.0840, 29.7570, true, now()),
+  ('RAF 602 S', 'Toyota Corolla', 'taxi', 4, -2.0850, 29.7560, true, now())
 on conflict (license_plate) do nothing;
 
 -- Sample Community Eyes reports
